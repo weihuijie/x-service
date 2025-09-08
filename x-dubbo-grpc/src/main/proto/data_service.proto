@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.x.grpc.data";
+option java_outer_classname = "DataServiceProto";
+
+package data;
+
+// 数据处理服务
+service DataService {
+  // 发送数据到Kafka
+  rpc SendToKafka (SendToKafkaRequest) returns (SendToKafkaResponse);
+  
+  // 发送数据到RabbitMQ
+  rpc SendToRabbitMQ (SendToRabbitMQRequest) returns (SendToRabbitMQResponse);
+  
+  // 存储数据到MinIO
+  rpc StoreToMinIO (StoreToMinIORequest) returns (StoreToMinIOResponse);
+  
+  // 异步处理数据
+  rpc ProcessDataAsync (ProcessDataAsyncRequest) returns (ProcessDataAsyncResponse);
+}
+
+// 设备数据
+message DeviceData {
+  string device_id = 1;
+  int64 timestamp = 2;
+  string data_type = 3;
+  string data = 4;
+}
+
+// 发送数据到Kafka请求
+message SendToKafkaRequest {
+  DeviceData device_data = 1;
+}
+
+// 发送数据到Kafka响应
+message SendToKafkaResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 发送数据到RabbitMQ请求
+message SendToRabbitMQRequest {
+  DeviceData device_data = 1;
+}
+
+// 发送数据到RabbitMQ响应
+message SendToRabbitMQResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 存储数据到MinIO请求
+message StoreToMinIORequest {
+  DeviceData device_data = 1;
+}
+
+// 存储数据到MinIO响应
+message StoreToMinIOResponse {
+  bool success = 1;
+  string message = 2;
+  string file_url = 3;
+}
+
+// 异步处理数据请求
+message ProcessDataAsyncRequest {
+  DeviceData device_data = 1;
+}
+
+// 异步处理数据响应
+message ProcessDataAsyncResponse {
+  bool success = 1;
+  string message = 2;
+  string file_url = 3;
+}

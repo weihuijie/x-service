@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8" addBOMForNewFiles="with BOM under Windows, with no BOM otherwise">
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-alert-notice-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-alert-notice-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-api-gateway-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-api-gateway-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-auth-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-auth-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-config-center-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-config-center-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-data-collection-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-data-collection-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-data-sync-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-data-sync-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-demo-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-demo-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-device-access-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-device-access-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-device-manage-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-device-manage-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-dubbo-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-dubbo-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-dubbo-grpc/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-dubbo-grpc/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-file-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-file-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-manage-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-manage-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-offline-analysis-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-offline-analysis-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-realtime-analysis-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-realtime-analysis-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-repository-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-repository-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-task-scheduler-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-task-scheduler-service/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

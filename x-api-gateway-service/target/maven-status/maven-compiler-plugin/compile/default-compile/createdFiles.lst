@@ -1,0 +1,3 @@
+com\x\api\gateway\service\ApiGatewayServiceApplication.class
+com\x\api\gateway\service\config\RestTemplateConfig.class
+com\x\api\gateway\service\filter\AuthFilter.class

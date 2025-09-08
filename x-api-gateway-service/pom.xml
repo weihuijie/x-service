@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>x</artifactId>
+        <groupId>com.x</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>x-api-gateway-service</artifactId>
+    <description>API网关，统一接入与权限校验</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.x</groupId>
+            <artifactId>x-common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!-- Spring Cloud Gateway依赖 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+            <!-- 如果默认版本无法下载，可以尝试指定一个可用版本 -->
+            <version>3.1.4</version>
+        </dependency>
+    </dependencies>
+
+</project>

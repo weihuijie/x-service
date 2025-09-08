@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: manage-service
+  labels:
+    app: manage-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: manage-service
+  template:
+    metadata:
+      labels:
+        app: manage-service
+    spec:
+      containers:
+      - name: manage-service
+        image: manage-service:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "k8s"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: manage-service
+spec:
+  selector:
+    app: manage-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

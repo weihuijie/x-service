@@ -1,0 +1,144 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "X-Service IoT Monitoring Dashboard",
+    "tags": ["iot", "microservices"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "25s",
+    "rows": [
+      {
+        "title": "System Overview",
+        "height": "250px",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Overall Health",
+            "type": "singlestat",
+            "span": 4,
+            "targets": [
+              {
+                "expr": "up",
+                "instant": true
+              }
+            ],
+            "valueName": "current"
+          },
+          {
+            "id": 2,
+            "title": "Total Requests",
+            "type": "graph",
+            "span": 8,
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total[5m]))",
+                "legendFormat": "Requests per second"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Service Metrics",
+        "height": "300px",
+        "panels": [
+          {
+            "id": 3,
+            "title": "Services Status",
+            "type": "table",
+            "span": 12,
+            "targets": [
+              {
+                "expr": "up",
+                "instant": true,
+                "format": "table"
+              }
+            ],
+            "transform": "table",
+            "columns": [
+              {"text": "Instance", "value": "instance"},
+              {"text": "Job", "value": "job"},
+              {"text": "Up", "value": "value"}
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Device Metrics",
+        "height": "300px",
+        "panels": [
+          {
+            "id": 4,
+            "title": "Connected Devices",
+            "type": "singlestat",
+            "span": 4,
+            "targets": [
+              {
+                "expr": "device_connected_total",
+                "instant": true
+              }
+            ],
+            "valueName": "current"
+          },
+          {
+            "id": 5,
+            "title": "Data Points Collected",
+            "type": "singlestat",
+            "span": 4,
+            "targets": [
+              {
+                "expr": "data_points_collected_total",
+                "instant": true
+              }
+            ],
+            "valueName": "current"
+          },
+          {
+            "id": 6,
+            "title": "Alerts Sent",
+            "type": "singlestat",
+            "span": 4,
+            "targets": [
+              {
+                "expr": "alerts_sent_total",
+                "instant": true
+              }
+            ],
+            "valueName": "current"
+          }
+        ]
+      },
+      {
+        "title": "Performance Metrics",
+        "height": "300px",
+        "panels": [
+          {
+            "id": 7,
+            "title": "JVM Memory Usage",
+            "type": "graph",
+            "span": 6,
+            "targets": [
+              {
+                "expr": "jvm_memory_used_bytes",
+                "legendFormat": "{{area}} memory"
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "title": "HTTP Request Latency",
+            "type": "graph",
+            "span": 6,
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+                "legendFormat": "95th percentile"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

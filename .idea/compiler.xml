@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="x-offline-analysis-service" />
+        <module name="x-task-scheduler-service" />
+        <module name="x-config-center-service" />
+        <module name="x-common" />
+        <module name="x-auth-service" />
+        <module name="x-realtime-analysis-service" />
+        <module name="x-manage-service" />
+        <module name="x-demo-service" />
+        <module name="x-repository-service" />
+        <module name="x-alert-notice-service" />
+        <module name="x-device-access-service" />
+        <module name="x-file-service" />
+        <module name="x-data-collection-service" />
+        <module name="x-data-sync-service" />
+        <module name="x-api-gateway-service" />
+        <module name="x-dubbo-grpc" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="x-device-manage-service" target="17" />
+      <module name="x-dubbo-common" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

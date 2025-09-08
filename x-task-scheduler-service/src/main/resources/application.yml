@@ -1,0 +1,18 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: task-scheduler-service
+    
+xxl:
+  job:
+    admin:
+      addresses: http://localhost:8080/xxl-job-admin
+    executor:
+      appname: task-scheduler-service
+      port: 9999
+
+logging:
+  level:
+    com.x.task.scheduler.service: debug

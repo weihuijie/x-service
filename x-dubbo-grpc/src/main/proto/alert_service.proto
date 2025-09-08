@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.x.grpc.alert";
+option java_outer_classname = "AlertServiceProto";
+
+package alert;
+
+// 告警通知服务
+service AlertService {
+  // 发送告警通知请求
+  rpc SendAlert (SendAlertRequest) returns (SendAlertResponse);
+}
+
+// 设备信息
+message SendAlertRequest {
+  int64 id = 1;
+  string name = 2;
+  string model = 3;
+  string status = 4;
+  string location = 5;
+  int64 create_time = 6;
+  int64 update_time = 7;
+}
+
+// 创建设备请求
+message CreateAlertRequest {
+  string name = 1;
+  string model = 2;
+  string status = 3;
+  string location = 4;
+}
+
+// 创建设备响应
+message CreateAlertResponse {
+  bool success = 1;
+  string message = 2;
+  Alert alert = 3;
+}
+
+// 获取设备请求
+message GetAlertRequest {
+  int64 id = 1;
+}
+
+// 获取设备响应
+message GetAlertResponse {
+  bool success = 1;
+  string message = 2;
+  Alert alert = 3;
+}
+
+// 更新设备状态请求
+message UpdateAlertStatusRequest {
+  int64 id = 1;
+  string status = 2;
+}
+
+// 更新设备状态响应
+message UpdateAlertStatusResponse {
+  bool success = 1;
+  string message = 2;
+  Alert alert = 3;
+}
+
+// 删除设备请求
+message DeleteAlertRequest {
+  int64 id = 1;
+}
+
+// 删除设备响应
+message DeleteAlertResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 获取设备列表请求
+message ListAlertsRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string status = 3;
+}
+
+// 获取设备列表响应
+message ListAlertsResponse {
+  bool success = 1;
+  string message = 2;
+  repeated Alert devices = 3;
+  int32 total = 4;
+}

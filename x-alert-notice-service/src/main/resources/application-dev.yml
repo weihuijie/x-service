@@ -1,0 +1,24 @@
+# dubbo 配置
+dubbo:
+  protocol:
+    name: grpc
+    port: -1
+  registry:
+      address: nacos://nacos:nacos@${nacos.address:127.0.0.1}:8848  # 认证
+      parameters.namespace: 5cbb70a5-xxx-xxx-xxx-d43479ae0932  # 自定义命名空间
+      group: dubbo  # 自定义分组
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest
+
+mysql:
+  url: jdbc:mysql://localhost:3306/x_alert?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+  username: root
+  password: root
+
+logging:
+  level:
+    com.x.alert.notice.service: debug

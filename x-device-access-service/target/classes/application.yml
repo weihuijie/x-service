@@ -1,0 +1,21 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: device-access-service
+    
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/device_access
+      
+  redis:
+    host: localhost
+    port: 6379
+
+netty:
+  port: 8000
+
+logging:
+  level:
+    com.x.device.access.service: debug

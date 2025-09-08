@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-service
+  labels:
+    app: demo-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-service
+  template:
+    metadata:
+      labels:
+        app: demo-service
+    spec:
+      containers:
+      - name: demo-service
+        image: demo-service:latest
+        ports:
+        - containerPort: 8099
+        - containerPort: 8001
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "k8s"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-service
+spec:
+  selector:
+    app: demo-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8099
+      targetPort: 8099
+    - name: netty
+      protocol: TCP
+      port: 8001
+      targetPort: 8001
+  type: ClusterIP

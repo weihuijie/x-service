@@ -1,0 +1,93 @@
+# 全局配置
+global:
+  scrape_interval:     15s # 默认抓取间隔
+  evaluation_interval: 15s # 规则评估间隔
+
+# 告警规则文件列表
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# 告警管理器配置
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      # - alertmanager:9093
+
+# 抓取配置
+scrape_configs:
+  # Prometheus自身监控
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['localhost:9090']
+
+  # Manage Service监控
+  - job_name: 'manage-service'
+    static_configs:
+    - targets: ['manage-service:8080']
+
+  # Repository Service监控
+  - job_name: 'repository-service'
+    static_configs:
+    - targets: ['repository-service:8081']
+
+  # Config Center Service监控
+  - job_name: 'config-center-service'
+    static_configs:
+    - targets: ['config-center-service:8082']
+
+  # Device Access Service监控
+  - job_name: 'device-access-service'
+    static_configs:
+    - targets: ['device-access-service:8083']
+
+  # Device Manage Service监控
+  - job_name: 'device-manage-service'
+    static_configs:
+    - targets: ['device-manage-service:8084']
+
+  # Data Collection Service监控
+  - job_name: 'data-collection-service'
+    static_configs:
+    - targets: ['data-collection-service:8085']
+
+  # Data Sync Service监控
+  - job_name: 'data-sync-service'
+    static_configs:
+    - targets: ['data-sync-service:8086']
+
+  # API Gateway Service监控
+  - job_name: 'api-gateway-service'
+    static_configs:
+    - targets: ['api-gateway-service:9000']
+
+  # Auth Service监控
+  - job_name: 'auth-service'
+    static_configs:
+    - targets: ['auth-service:8087']
+
+  # Real-time Analysis Service监控
+  - job_name: 'realtime-analysis-service'
+    static_configs:
+    - targets: ['realtime-analysis-service:8088']
+
+  # Offline Analysis Service监控
+  - job_name: 'offline-analysis-service'
+    static_configs:
+    - targets: ['offline-analysis-service:8089']
+
+  # Alert Notice Service监控
+  - job_name: 'alert-notice-service'
+    static_configs:
+    - targets: ['alert-notice-service:8090']
+
+  # Task Scheduler Service监控
+  - job_name: 'task-scheduler-service'
+    static_configs:
+    - targets: ['task-scheduler-service:8091']
+
+  # File Service监控
+  - job_name: 'file-service'
+    static_configs:
+    - targets: ['file-service:8092']
