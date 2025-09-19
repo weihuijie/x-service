@@ -20,6 +20,7 @@ com\x\common\utils\sign\Base64.class
 com\x\common\component\RedisComponentUtil.class
 com\x\common\utils\uuid\UUID$Holder.class
 com\x\common\utils\Threads.class
+com\x\common\exception\BusinessException.class
 com\x\common\utils\html\HTMLFilter.class
 com\x\common\utils\TimeTool.class
 com\x\common\component\HadoopComponentUtil.class

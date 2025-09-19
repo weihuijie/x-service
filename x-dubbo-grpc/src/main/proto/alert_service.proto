@@ -9,11 +9,26 @@ package alert;
 // 告警通知服务
 service AlertService {
   // 发送告警通知请求
-  rpc SendAlert (SendAlertRequest) returns (SendAlertResponse);
+  rpc SendAlert (SendAlertRequest) returns (SendAlertResponse) {}
+  
+  // 创建告警
+  rpc CreateAlert (CreateAlertRequest) returns (CreateAlertResponse);
+  
+  // 获取告警
+  rpc GetAlert (GetAlertRequest) returns (GetAlertResponse);
+  
+  // 更新告警状态
+  rpc UpdateAlertStatus (UpdateAlertStatusRequest) returns (UpdateAlertStatusResponse);
+  
+  // 删除告警
+  rpc DeleteAlert (DeleteAlertRequest) returns (DeleteAlertResponse);
+  
+  // 获取告警列表
+  rpc ListAlerts (ListAlertsRequest) returns (ListAlertsResponse);
 }
 
-// 设备信息
-message SendAlertRequest {
+// 告警信息
+message Alert {
   int64 id = 1;
   string name = 2;
   string model = 3;
@@ -23,7 +38,23 @@ message SendAlertRequest {
   int64 update_time = 7;
 }
 
-// 创建设备请求
+// 发送告警通知请求
+message SendAlertRequest {
+  int64 id = 1;
+  string name = 2;
+  string model = 3;
+  string status = 4;
+  string location = 5;
+  int64 create_time = 6;
+  int64 update_time = 7;
+}
+// 发送告警通知相应
+message SendAlertResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 创建告警请求
 message CreateAlertRequest {
   string name = 1;
   string model = 2;
@@ -31,60 +62,60 @@ message CreateAlertRequest {
   string location = 4;
 }
 
-// 创建设备响应
+// 创建告警响应
 message CreateAlertResponse {
   bool success = 1;
   string message = 2;
   Alert alert = 3;
 }
 
-// 获取设备请求
+// 获取告警请求
 message GetAlertRequest {
   int64 id = 1;
 }
 
-// 获取设备响应
+// 获取告警响应
 message GetAlertResponse {
   bool success = 1;
   string message = 2;
   Alert alert = 3;
 }
 
-// 更新设备状态请求
+// 更新告警状态请求
 message UpdateAlertStatusRequest {
   int64 id = 1;
   string status = 2;
 }
 
-// 更新设备状态响应
+// 更新告警状态响应
 message UpdateAlertStatusResponse {
   bool success = 1;
   string message = 2;
   Alert alert = 3;
 }
 
-// 删除设备请求
+// 删除告警请求
 message DeleteAlertRequest {
   int64 id = 1;
 }
 
-// 删除设备响应
+// 删除告警响应
 message DeleteAlertResponse {
   bool success = 1;
   string message = 2;
 }
 
-// 获取设备列表请求
+// 获取告警列表请求
 message ListAlertsRequest {
   int32 page = 1;
   int32 size = 2;
   string status = 3;
 }
 
-// 获取设备列表响应
+// 获取告警列表响应
 message ListAlertsResponse {
   bool success = 1;
   string message = 2;
-  repeated Alert devices = 3;
+  repeated Alert alerts = 3;
   int32 total = 4;
 }

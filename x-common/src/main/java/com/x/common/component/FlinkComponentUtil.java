@@ -75,15 +75,6 @@ public class FlinkComponentUtil {
     }
 
     /**
-     * 对数据流进行键控分组
-     * @param dataStream 数据流
-     * @param keySelector 键选择器
-     * @param <T> 数据类型
-     * @param <K> 键类型
-     * @return 键控流
-     */
-
-    /**
      * 执行流处理任务
      * @param env 流执行环境
      * @param jobName 作业名称

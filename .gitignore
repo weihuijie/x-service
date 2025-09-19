@@ -1,0 +1,23 @@
+.DS_Store
+node_modules/
+dist/
+**/*.log
+
+tests/**/coverage/
+tests/e2e/reports
+selenium-debug.log
+
+# Editor directories and files
+.idea
+.vscode
+target
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.local
+
+package-lock.json
+yarn.lock
+/dist.zip
+*.iml

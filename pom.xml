@@ -69,6 +69,7 @@
         <nacos.version>0.3.0-RC</nacos.version>
         <grpc.version>1.58.0</grpc.version>
         <protobuf.version>3.24.0</protobuf.version>
+        <dubbo.version>3.3.0</dubbo.version>
 
         <!-- 消息队列版本 -->
         <kafka.version>3.3.1</kafka.version>
@@ -87,6 +88,9 @@
         <micrometer.version>1.11.0</micrometer.version>
         <prometheus.version>1.11.0</prometheus.version>
         <logstash.version>7.2</logstash.version>
+        
+        <!-- Zookeeper版本 -->
+        <curator.version>5.2.0</curator.version>
     </properties>
 
     <!-- 依赖声明 子模块可以继承这些依赖-->
@@ -286,7 +290,6 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-gateway</artifactId>
-                <version>${spring-cloud.version}</version>
             </dependency>
 
             <!-- OAuth2认证 -->
@@ -400,7 +403,7 @@
             <dependency>
                 <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo-bom</artifactId>
-                <version>3.3.0</version>
+                <version>${dubbo.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -408,13 +411,13 @@
             <dependency>
                 <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo-spring-boot-starter</artifactId>
-                <version>3.3.0</version>
+                <version>${dubbo.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo-nacos-spring-boot-starter</artifactId>
-                <version>3.3.0</version>
+                <version>${dubbo.version}</version>
             </dependency>
 
             <!-- Dubbo gRPC支持 -->
@@ -430,13 +433,13 @@
             <dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-framework</artifactId>
-                <version>5.2.0</version>
+                <version>${curator.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-recipes</artifactId>
-                <version>5.2.0</version>
+                <version>${curator.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

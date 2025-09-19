@@ -1,5 +1,10 @@
 server:
   port: 9000
+  servlet:
+    context-path: /api-gateway
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain,text/css,application/javascript
 
 spring:
   application:
@@ -7,16 +12,130 @@ spring:
     
   cloud:
     gateway:
+      # 启用熔断
+      default-filters:
+        - name: CircuitBreaker
+          args:
+            name: defaultCircuitBreaker
+            fallbackUri: forward:/fallback
       routes:
         - id: manage-service
-          uri: http://localhost:8080
+          uri: lb://x-manage-service
           predicates:
             - Path=/manage/**
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: '#{@userKeyResolver}'
+            - name: CircuitBreaker
+              args:
+                name: manageServiceCircuitBreaker
+                fallbackUri: forward:/fallback/manage
         - id: device-service
-          uri: http://localhost:8084
+          uri: lb://x-device-access-service
           predicates:
             - Path=/device/**
+            - Method=GET,POST
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                key-resolver: '#{@userKeyResolver}'
+        - id: auth-service
+          uri: lb://x-auth-service
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+        - id: file-service
+          uri: lb://x-file-service
+          predicates:
+            - Path=/file/**
+          filters:
+            - StripPrefix=1
+            - AddResponseHeader=X-Response-Time, #{T(System).currentTimeMillis()}
+        - id: alert-service
+          uri: lb://x-alert-notice-service
+          predicates:
+            - Path=/alert/**
+          filters:
+            - StripPrefix=1
+        - id: data-service
+          uri: lb://x-data-collection-service
+          predicates:
+            - Path=/data/**
+          filters:
+            - StripPrefix=1
+        - id: swagger-ui
+          uri: http://localhost:9000
+          predicates:
+            - Path=/swagger-ui/**
+        - id: api-docs
+          uri: http://localhost:9000
+          predicates:
+            - Path=/v3/api-docs/**
+    # 负载均衡配置
+    loadbalancer:
+      ribbon:
+        enabled: false
+  # Redis配置
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 2000ms
 
+# 熔断器配置
+resilience4j:
+  circuitbreaker:
+    instances:
+      defaultCircuitBreaker:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5000
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: TIME_BASED
+        minimumNumberOfCalls: 5
+      manageServiceCircuitBreaker:
+        slidingWindowSize: 10
+        failureRateThreshold: 40
+        waitDurationInOpenState: 3000
+
+# 监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# 日志配置
 logging:
   level:
     com.x.api.gateway.service: debug
+    org.springframework.cloud.gateway: info
+    reactor.netty.http.client: info
+
+# OpenAPI配置
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+# 添加新路由配置
+# 增加追踪配置
