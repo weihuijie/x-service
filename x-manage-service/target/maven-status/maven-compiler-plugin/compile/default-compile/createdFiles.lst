@@ -1,8 +1,0 @@
-com\x\manage\service\service\DeviceGrpcClientService.class
-com\x\manage\service\service\impl\DeviceServiceImpl.class
-com\x\manage\service\controller\GrpcDemoController.class
-com\x\manage\service\controller\DeviceController.class
-com\x\manage\service\ManageServiceApplication.class
-com\x\manage\service\service\DeviceService.class
-com\x\manage\service\entity\Device.class
-com\x\manage\service\mapper\DeviceMapper.class
