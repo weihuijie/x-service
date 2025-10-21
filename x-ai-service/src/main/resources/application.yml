@@ -1,0 +1,24 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: ai-service
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:dummy-key-for-testing}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      chat:
+        options:
+          model: ${OPENAI_MODEL:gpt-3.5-turbo}
+          temperature: 0.7
+
+# gRPC配置
+grpc:
+  server:
+    port: 9095
+
+logging:
+  level:
+    com.x.ai.service: debug
+    org.springframework.ai: debug

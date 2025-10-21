@@ -2,13 +2,9 @@ package com.x.api.gateway.service.client;
 
 import com.x.grpc.auth.*;
 import org.apache.dubbo.config.annotation.DubboReference;
-// RpcStatus 已弃用，使用新版本的 Dubbo 熔断监控方式
-// import org.apache.dubbo.rpc.cluster.RpcStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Dubbo认证服务客户端 - 使用Dubbo调用认证服务的gRPC接口
@@ -106,26 +102,10 @@ public class DubboAuthServiceClient {
             String operation,
             FallbackProvider<T> fallbackProvider) {
         
-        // 简单的服务熔断判断 - 实际项目中可以集成Sentinel或Resilience4j
-        String serviceKey = "AuthService." + operation;
-        RpcStatus status = RpcStatus.getStatus(authService, serviceKey);
-        
-        // 如果失败率超过50%，则触发熔断
-        if (status.getActive() > 10 && status.getFailed() * 2 > status.getTotal()) {
-            logger.warn("Circuit breaker triggered for {}", serviceKey);
-            return fallbackProvider.getFallback();
-        }
-        
         try {
             return call.call();
         } catch (Exception e) {
             logger.error("Failed to call auth service {}: {}", operation, e.getMessage(), e);
-            try {
-                // 记录失败状态
-                RpcStatus.recordError(1, TimeUnit.MILLISECONDS, status);
-            } catch (Exception ex) {
-                // 忽略记录状态时的异常
-            }
             return fallbackProvider.getFallback();
         }
     }

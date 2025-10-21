@@ -30,6 +30,7 @@
         <module>x-task-scheduler-service</module>
         <module>x-file-service</module>
         <module>x-demo-service</module>
+        <module>x-ai-service</module>
     </modules>
 
     <properties><!-- 配置，一般为版本管理 -->
@@ -43,7 +44,7 @@
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <druid.version>1.2.20</druid.version>
         <bitwalker.version>1.21</bitwalker.version>
-        <springdoc.version>2.3.0</springdoc.version>
+        <springdoc.version>2.1.0</springdoc.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <pagehelper.boot.version>1.4.7</pagehelper.boot.version>
         <fastjson.version>2.0.43</fastjson.version>
@@ -273,6 +274,13 @@
                 <version>${iotdb.version}</version>
             </dependency>
 
+            <!-- 数据库相关依赖 -->
+            <dependency>
+                <groupId>org.apache.iotdb</groupId>
+                <artifactId>service-rpc</artifactId>
+                <version>${iotdb.version}</version>
+            </dependency>
+
             <!-- 大数据处理框架 -->
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
@@ -285,13 +293,6 @@
                 <artifactId>flink-streaming-java</artifactId>
                 <version>${flink.version}</version>
             </dependency>
-
-            <!-- 微服务相关 -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-gateway</artifactId>
-            </dependency>
-
             <!-- OAuth2认证 -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -441,6 +442,13 @@
                 <artifactId>curator-recipes</artifactId>
                 <version>${curator.version}</version>
             </dependency>
+
+            <!-- Swagger/OpenAPI文档 -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -501,6 +509,15 @@
     </repositories>
 
     <pluginRepositories> <!-- 声明 Maven 插件（即 <plugins> 中定义的工具）从哪些仓库下载 -->
+        <pluginRepository>
+            <id>local</id>
+            <name>本地</name>
+            <url>file://D:/soft/Repository</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+
         <pluginRepository>
             <id>public</id>
             <name>阿里云公共仓库</name>
