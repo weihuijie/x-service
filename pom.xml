@@ -30,7 +30,6 @@
         <module>x-task-scheduler-service</module>
         <module>x-file-service</module>
         <module>x-demo-service</module>
-        <module>x-ai-service</module>
     </modules>
 
     <properties><!-- 配置，一般为版本管理 -->
@@ -54,7 +53,11 @@
         <easyexcel.version>4.0.1</easyexcel.version>
         <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
-        <lombok.version>1.18.22</lombok.version>
+        <!-- 日志打印 -->
+        <lombok.version>1.18.30</lombok.version>
+        <slf4j.version>2.0.9</slf4j.version>
+        <logback.version>1.4.8</logback.version>
+
         <hutool.version>5.8.26</hutool.version>
         <caffeine.version>3.1.8</caffeine.version>
         <joda.version>2.10.14</joda.version>
@@ -227,13 +230,6 @@
                 <groupId>pro.fessional</groupId>
                 <artifactId>kaptcha</artifactId>
                 <version>${kaptcha.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>

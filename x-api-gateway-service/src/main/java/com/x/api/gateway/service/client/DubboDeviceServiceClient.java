@@ -5,6 +5,11 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import com.x.common.base.R;
+import com.x.common.base.ResultCode;
+
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Dubbo设备服务客户端 - 使用Dubbo调用设备管理服务的gRPC接口
@@ -26,128 +31,41 @@ public class DubboDeviceServiceClient {
     private DubboDeviceServiceGrpc.IDeviceService deviceService;
 
     /**
-     * 创建设备
-     * @param name 设备名称
-     * @param model 设备型号
-     * @param status 设备状态
-     * @param location 设备位置
-     * @return 创建结果
+     * 执行操作 - 通用方法，将操作委托给设备服务内部处理
+     * @param operation 操作名称
+     * @param params 参数
+     * @return 执行结果
      */
-    public CreateDeviceResponse createDevice(String name, String model, String status, String location) {
-        return invokeWithErrorHandling(
-                () -> {
-                    logger.debug("Calling device service createDevice: {}", name);
-                    CreateDeviceRequest request = CreateDeviceRequest.newBuilder()
-                            .setName(name)
-                            .setModel(model)
-                            .setStatus(status)
-                            .setLocation(location)
-                            .build();
-                    return deviceService.createDevice(request);
-                },
-                "createDevice",
-                () -> CreateDeviceResponse.newBuilder()
-                        .setSuccess(false)
-                        .setMessage("Failed to create device")
-                        .build()
-        );
-    }
-
-    /**
-     * 获取设备信息
-     * @param id 设备ID
-     * @return 设备信息
-     */
-    public GetDeviceResponse getDevice(long id) {
-        return invokeWithErrorHandling(
-                () -> {
-                    logger.debug("Calling device service getDevice: {}", id);
-                    GetDeviceRequest request = GetDeviceRequest.newBuilder()
-                            .setId(id)
-                            .build();
-                    return deviceService.getDevice(request);
-                },
-                "getDevice",
-                () -> GetDeviceResponse.newBuilder()
-                        .setSuccess(false)
-                        .setMessage("Failed to get device")
-                        .build()
-        );
-    }
-
-    /**
-     * 更新设备状态
-     * @param id 设备ID
-     * @param status 新状态
-     * @return 更新结果
-     */
-    public UpdateDeviceStatusResponse updateDeviceStatus(long id, String status) {
-        return invokeWithErrorHandling(
-                () -> {
-                    logger.debug("Calling device service updateDeviceStatus: {}, {}", id, status);
-                    UpdateDeviceStatusRequest request = UpdateDeviceStatusRequest.newBuilder()
-                            .setId(id)
-                            .setStatus(status)
-                            .build();
-                    return deviceService.updateDeviceStatus(request);
-                },
-                "updateDeviceStatus",
-                () -> UpdateDeviceStatusResponse.newBuilder()
-                        .setSuccess(false)
-                        .setMessage("Failed to update device status")
-                        .build()
-        );
-    }
-
-    /**
-     * 删除设备
-     * @param id 设备ID
-     * @return 删除结果
-     */
-    public DeleteDeviceResponse deleteDevice(long id) {
-        return invokeWithErrorHandling(
-                () -> {
-                    logger.debug("Calling device service deleteDevice: {}", id);
-                    DeleteDeviceRequest request = DeleteDeviceRequest.newBuilder()
-                            .setId(id)
-                            .build();
-                    return deviceService.deleteDevice(request);
-                },
-                "deleteDevice",
-                () -> DeleteDeviceResponse.newBuilder()
-                        .setSuccess(false)
-                        .setMessage("Failed to delete device")
-                        .build()
-        );
-    }
-
-    /**
-     * 获取设备列表
-     * @param page 页码
-     * @param size 每页大小
-     * @param status 设备状态(可选)
-     * @return 设备列表
-     */
-    public ListDevicesResponse listDevices(int page, int size, String status) {
-        return invokeWithErrorHandling(
-                () -> {
-                    logger.debug("Calling device service listDevices: page={}, size={}, status={}", page, size, status);
-                    ListDevicesRequest.Builder requestBuilder = ListDevicesRequest.newBuilder()
-                            .setPage(page)
-                            .setSize(size);
-                    
-                    if (status != null && !status.isEmpty()) {
-                        requestBuilder.setStatus(status);
-                    }
-                    
-                    return deviceService.listDevices(requestBuilder.build());
-                },
-                "listDevices",
-                () -> ListDevicesResponse.newBuilder()
-                        .setSuccess(false)
-                        .setMessage("Failed to list devices")
-                        .build()
-        );
+    public R<Map<String, Object>> executeOperation(String operation, Map<String, Object> params) {
+        try {
+            logger.debug("Calling device service executeOperation: {}", operation);
+            
+            // 构建请求对象
+            ExecuteOperationRequest.Builder requestBuilder = ExecuteOperationRequest.newBuilder()
+                    .setOperation(operation);
+            
+            // 添加参数
+            params.forEach((key, value) -> {
+                if (value != null) {
+                    requestBuilder.putParams(key, value.toString());
+                }
+            });
+            
+            // 调用服务
+            ExecuteOperationResponse response = deviceService.executeOperation(requestBuilder.build());
+            // 转换响应
+            Map<String, Object> data = new HashMap<>(response.getDataMap());
+            
+            if (response.getSuccess()) {
+                R.success(ResultCode.SUCCESS, response.getMessage());
+            } else {
+                response.getMessage();
+            }
+            return R.data(data);
+        } catch (Exception e) {
+            logger.error("Failed to call device service executeOperation: {}", e.getMessage(), e);
+            return R.fail(ResultCode.INTERNAL_SERVER_ERROR, "Failed to execute operation: " + e.getMessage());
+        }
     }
 
     // 通用的Dubbo服务调用与错误处理

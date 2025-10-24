@@ -55,9 +55,12 @@ public class LoggingFilter implements GlobalFilter, Ordered {
                 requestId, method, path, clientIp, LocalDateTime.now().format(formatter));
         
         // 记录请求头信息（可选，生产环境可能需要根据敏感程度决定是否记录）
-        // request.getHeaders().forEach((name, values) -> {
-        //     logger.debug("[{}] Request Header: {}={}", requestId, name, values);
-        // });
+        request.getHeaders().forEach((name, values) -> {
+            // 避免记录敏感信息
+            if (!name.toLowerCase().contains("authorization") && !name.toLowerCase().contains("token")) {
+                logger.debug("[{}] Request Header: {}={}", requestId, name, values);
+            }
+        });
         
         // 执行过滤器链并记录响应信息
         return chain.filter(modifiedExchange).then(Mono.fromRunnable(() -> {

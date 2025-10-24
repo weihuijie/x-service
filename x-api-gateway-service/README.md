@@ -35,7 +35,8 @@ src/main/java/com/x/api/gateway/service/
 ├── ApiGatewayServiceApplication.java  # 应用入口
 ├── config/
 │   ├── GatewayConfig.java             # 网关核心配置
-│   └── RestTemplateConfig.java        # RestTemplate配置
+│   ├── RestTemplateConfig.java        # RestTemplate配置
+│   └── ServiceOperationConfig.java    # 服务操作配置
 ├── filter/
 │   ├── AuthFilter.java                # 认证过滤器
 │   ├── LoggingFilter.java             # 日志过滤器
@@ -45,8 +46,20 @@ src/main/java/com/x/api/gateway/service/
 │   └── FallbackController.java        # 熔断降级控制器
 ├── predicate/
 │   └── QueryParamRoutePredicateFactory.java # 自定义请求参数断言
+├── controller/
+│   ├── DispatcherController.java      # 旧版分发控制器
+│   └── FlexibleDispatcherController.java # 新版灵活分发控制器
+├── dispatcher/
+│   ├── ServiceDispatcher.java         # 服务分发器
+│   ├── ServiceOperationRegistry.java  # 服务操作注册中心
+│   ├── ServiceOperation.java          # 服务操作接口
+│   └── operation/
+│       ├── AuthServiceOperation.java  # 认证服务操作实现
+│       └── DeviceServiceOperation.java # 设备服务操作实现
 └── client/
-    └── AuthServiceClient.java         # 认证服务Feign客户端
+    ├── AuthServiceClient.java         # 认证服务Feign客户端
+    ├── DubboAuthServiceClient.java    # Dubbo认证服务客户端
+    └── DubboDeviceServiceClient.java  # Dubbo设备服务客户端
 ```
 
 ## 配置说明
@@ -125,6 +138,10 @@ java -jar x-api-gateway-service-1.0.0.jar
 - 访问管理服务：`http://localhost:9000/api-gateway/manage/users`
 - 访问设备服务：`http://localhost:9000/api-gateway/device/list`
 
+新版灵活分发接口：
+- POST请求：`http://localhost:9000/api-gateway/api/v2/{serviceType}/{operation}`
+- GET请求：`http://localhost:9000/api-gateway/api/v2/{serviceType}/{operation}?param1=value1&param2=value2`
+
 ### API文档
 
 Swagger UI访问地址：`http://localhost:9000/api-gateway/swagger-ui.html`
@@ -156,6 +173,14 @@ Prometheus监控指标：`http://localhost:9000/api-gateway/actuator/prometheus`
 1. 创建继承`AbstractRoutePredicateFactory`的断言工厂类
 2. 添加`@Component`注解使其被Spring容器管理
 3. 实现相关方法和配置类
+
+### 添加新的服务操作
+
+1. 在对应的Dubbo客户端中添加新的服务方法
+2. 创建实现`ServiceOperation`接口的类
+3. 实现`execute`、`getServiceType`和`getOperationName`方法
+4. 在`ServiceOperationConfig`中注册新的服务操作
+5. 通过`/api/v2/{serviceType}/{operation}`接口访问新服务
 
 ## 注意事项
 

@@ -5,6 +5,11 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import com.x.common.base.R;
+import com.x.common.base.ResultCode;
+
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Dubbo认证服务客户端 - 使用Dubbo调用认证服务的gRPC接口
@@ -27,73 +32,41 @@ public class DubboAuthServiceClient {
     private DubboAuthServiceGrpc.IAuthService authService;
 
     /**
-     * 用户登录
-     * @param username 用户名
-     * @param password 密码
-     * @return 登录响应
+     * 执行操作 - 通用方法，将操作委托给认证服务内部处理
+     * @param operation 操作名称
+     * @param params 参数
+     * @return 执行结果
      */
-    public LoginResponse login(String username, String password) {
-        return invokeWithErrorHandling(
-                () -> {
-                    logger.debug("Calling auth service login with username: {}", username);
-                    LoginRequest request = LoginRequest.newBuilder()
-                            .setUsername(username)
-                            .setPassword(password)
-                            .build();
-                    return authService.login(request);
-                },
-                "login",
-                () -> LoginResponse.newBuilder()
-                        .setSuccess(false)
-                        .setMessage("Failed to call auth service: login")
-                        .build()
-        );
-    }
-
-    /**
-     * 验证Token
-     * @param token 用户token
-     * @return 验证结果
-     */
-    public ValidateTokenResponse validateToken(String token) {
-        return invokeWithErrorHandling(
-                () -> {
-                    logger.debug("Calling auth service validateToken");
-                    ValidateTokenRequest request = ValidateTokenRequest.newBuilder()
-                            .setToken(token)
-                            .build();
-                    return authService.validateToken(request);
-                },
-                "validateToken",
-                () -> ValidateTokenResponse.newBuilder()
-                        .setValid(false)
-                        .setMessage("Failed to validate token")
-                        .build()
-        );
-    }
-
-    /**
-     * 检查权限
-     * @param token 用户token
-     * @param permission 权限名称
-     * @return 权限检查结果
-     */
-    public CheckPermissionResponse checkPermission(String token, String permission) {
-        return invokeWithErrorHandling(
-                () -> {
-                    logger.debug("Calling auth service checkPermission for permission: {}", permission);
-                    CheckPermissionRequest request = CheckPermissionRequest.newBuilder()
-                            .setToken(token)
-                            .setPermission(permission)
-                            .build();
-                    return authService.checkPermission(request);
-                },
-                "checkPermission",
-                () -> CheckPermissionResponse.newBuilder()
-                        .setHasPermission(false)
-                        .setMessage("Failed to check permission")
-                        .build()
-        );
+    public R<Map<String, Object>> executeOperation(String operation, Map<String, Object> params) {
+        try {
+            logger.debug("Calling auth service executeOperation: {}", operation);
+            
+            // 构建请求对象
+            ExecuteOperationRequest.Builder requestBuilder = ExecuteOperationRequest.newBuilder()
+                    .setOperation(operation);
+            
+            // 添加参数
+            params.forEach((key, value) -> {
+                if (value != null) {
+                    requestBuilder.putParams(key, value.toString());
+                }
+            });
+            
+            // 调用服务
+            ExecuteOperationResponse response = authService.executeOperation(requestBuilder.build());
+            
+            // 转换响应
+            Map<String, Object> data = new HashMap<>(response.getDataMap());
+            if (response.getSuccess()) {
+                R.success(ResultCode.SUCCESS, response.getMessage());
+            } else {
+                response.getMessage();
+            }
+            return R.data(data);
+        } catch (Exception e) {
+            logger.error("Failed to call auth service executeOperation: {}", e.getMessage(), e);
+            return R.fail(ResultCode.INTERNAL_SERVER_ERROR, "Failed to execute operation: " + e.getMessage());
+        }
     }
 
     // 通用的Dubbo服务调用与错误处理

@@ -71,6 +71,36 @@ spring:
             - Path=/data/**
           filters:
             - StripPrefix=1
+        - id: config-service
+          uri: lb://x-config-center-service
+          predicates:
+            - Path=/config/**
+          filters:
+            - StripPrefix=1
+        - id: repository-service
+          uri: lb://x-repository-service
+          predicates:
+            - Path=/repository/**
+          filters:
+            - StripPrefix=1
+        - id: offline-analysis-service
+          uri: lb://x-offline-analysis-service
+          predicates:
+            - Path=/offline-analysis/**
+          filters:
+            - StripPrefix=1
+        - id: realtime-analysis-service
+          uri: lb://x-realtime-analysis-service
+          predicates:
+            - Path=/realtime-analysis/**
+          filters:
+            - StripPrefix=1
+        - id: task-scheduler-service
+          uri: lb://x-task-scheduler-service
+          predicates:
+            - Path=/task/**
+          filters:
+            - StripPrefix=1
         - id: swagger-ui
           uri: http://localhost:9000
           predicates:
@@ -84,11 +114,12 @@ spring:
       ribbon:
         enabled: false
   # Redis配置
-  redis:
-    host: localhost
-    port: 6379
-    database: 0
-    timeout: 2000ms
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 2000ms
 
 # 熔断器配置
 resilience4j:

@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.springframework.lang.Nullable;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @NoArgsConstructor
 public class R<T> implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	private int code;

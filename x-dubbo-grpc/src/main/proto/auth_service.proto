@@ -16,6 +16,9 @@ service AuthService {
   
   // 检查权限
   rpc CheckPermission (CheckPermissionRequest) returns (CheckPermissionResponse);
+  
+  // 通用操作执行
+  rpc ExecuteOperation (ExecuteOperationRequest) returns (ExecuteOperationResponse);
 }
 
 // 登录请求
@@ -58,4 +61,18 @@ message CheckPermissionRequest {
 message CheckPermissionResponse {
   bool has_permission = 1;
   string message = 2;
+}
+
+// 通用操作执行请求
+message ExecuteOperationRequest {
+  string operation = 1;
+  map<string, string> params = 2;
+}
+
+// 通用操作执行响应
+message ExecuteOperationResponse {
+  bool success = 1;
+  int32 code = 2;
+  string message = 3;
+  map<string, string> data = 4;
 }

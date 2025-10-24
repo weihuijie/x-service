@@ -22,6 +22,9 @@ service DeviceService {
   
   // 获取设备列表
   rpc ListDevices (ListDevicesRequest) returns (ListDevicesResponse);
+  
+  // 通用操作执行
+  rpc ExecuteOperation (ExecuteOperationRequest) returns (ExecuteOperationResponse);
 }
 
 // 设备信息
@@ -99,4 +102,18 @@ message ListDevicesResponse {
   string message = 2;
   repeated Device devices = 3;
   int32 total = 4;
+}
+
+// 通用操作执行请求
+message ExecuteOperationRequest {
+  string operation = 1;
+  map<string, string> params = 2;
+}
+
+// 通用操作执行响应
+message ExecuteOperationResponse {
+  bool success = 1;
+  int32 code = 2;
+  string message = 3;
+  map<string, string> data = 4;
 }
