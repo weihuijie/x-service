@@ -28,6 +28,18 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+  server:
+    port: 9094
+
+# Dubbo配置
+dubbo:
+  application:
+    name: ${spring.application.name}
+  registry:
+    address: nacos://nacos:nacos@127.0.0.1:8848
+  protocol:
+    name: grpc
+    port: -1
 
 management:
   endpoints:

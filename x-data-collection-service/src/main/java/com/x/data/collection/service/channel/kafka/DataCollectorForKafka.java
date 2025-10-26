@@ -1,5 +1,6 @@
 package com.x.data.collection.service.channel.kafka;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -8,6 +9,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class DataCollectorForKafka {
+
+    @Autowired
+    private HighPerformanceDataCollector highPerformanceDataCollector;
 
     // 模拟存储收集到的数据统计信息
     private final ConcurrentHashMap<String, AtomicLong> deviceDataCount = new ConcurrentHashMap<>();
@@ -27,7 +31,8 @@ public class DataCollectorForKafka {
      * @param data 数据内容
      */
     public boolean processDeviceData(String deviceId, String data) {
-        // 实际项目中这里会进行数据处理
+        // 使用高性能数据收集器处理数据
+        highPerformanceDataCollector.collectDeviceData(deviceId, data);
 
         // 记录设备数据点数量
         deviceDataCount.computeIfAbsent(deviceId, k -> new AtomicLong(0)).incrementAndGet();
@@ -76,6 +81,13 @@ public class DataCollectorForKafka {
      */
     public long getTotalDataPoints() {
         return totalDataPoints.get();
+    }
+
+    /**
+     * 获取高性能数据收集器统计信息
+     */
+    public HighPerformanceDataCollector.DataCollectionStats getHighPerformanceStats() {
+        return highPerformanceDataCollector.getStats();
     }
 
     /**

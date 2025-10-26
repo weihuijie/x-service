@@ -33,7 +33,7 @@
     </modules>
 
     <properties><!-- 配置，一般为版本管理 -->
-        <spring-boot.version>3.1.5</spring-boot.version>
+        <spring-boot.version>3.2.0</spring-boot.version>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -69,15 +69,15 @@
         <shardingsphere.version>5.2.1</shardingsphere.version>
 
         <!-- 微服务相关版本 -->
-        <spring-cloud.version>2022.0.1</spring-cloud.version>
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
         <nacos.version>0.3.0-RC</nacos.version>
-        <grpc.version>1.58.0</grpc.version>
+        <grpc.version>1.66.0</grpc.version>
         <protobuf.version>3.24.0</protobuf.version>
         <dubbo.version>3.3.0</dubbo.version>
 
         <!-- 消息队列版本 -->
         <kafka.version>3.3.1</kafka.version>
-        <rabbitmq.version>5.16.0</rabbitmq.version>
+        <rabbitmq.version>5.18.0</rabbitmq.version>
 
         <!-- 大数据处理版本 -->
         <hadoop.version>3.3.4</hadoop.version>
@@ -360,24 +360,6 @@
 
             <!-- gRPC相关依赖 -->
             <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-protobuf</artifactId>
-                <version>${grpc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-stub</artifactId>
-                <version>${grpc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-netty-shaded</artifactId>
-                <version>${grpc.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
@@ -415,15 +397,6 @@
                 <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo-nacos-spring-boot-starter</artifactId>
                 <version>${dubbo.version}</version>
-            </dependency>
-
-            <!-- Dubbo gRPC支持 -->
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-bom</artifactId>
-                <version>${grpc.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
 
             <!-- Zookeeper依赖 -->

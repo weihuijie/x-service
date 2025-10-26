@@ -58,7 +58,10 @@ spring:
             - Path=/file/**
           filters:
             - StripPrefix=1
-            - AddResponseHeader=X-Response-Time, #{T(System).currentTimeMillis()}
+            - name: AddResponseHeader
+              args:
+                name: X-Response-Time
+                value: "N/A"
         - id: alert-service
           uri: lb://x-alert-notice-service
           predicates:
@@ -121,6 +124,19 @@ spring:
       database: 0
       timeout: 2000ms
 
+# Dubbo配置
+dubbo:
+  application:
+    name: ${spring.application.name}
+  registry:
+    address: nacos://nacos:nacos@127.0.0.1:8848
+  config-center:
+    address: nacos://nacos:nacos@127.0.0.1:8848
+    config-file: dubbo.properties
+  protocol:
+    name: grpc
+    port: -1
+
 # 熔断器配置
 resilience4j:
   circuitbreaker:
@@ -148,9 +164,9 @@ management:
       show-details: always
     gateway:
       enabled: true
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
 
 # 日志配置

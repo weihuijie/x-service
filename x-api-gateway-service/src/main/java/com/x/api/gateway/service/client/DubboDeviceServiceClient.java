@@ -1,23 +1,21 @@
 package com.x.api.gateway.service.client;
 
-import com.x.grpc.device.*;
-import org.apache.dubbo.config.annotation.DubboReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import com.google.protobuf.Message;
 import com.x.common.base.R;
-import com.x.common.base.ResultCode;
+import com.x.grpc.device.DubboDeviceServiceGrpc;
+import com.x.grpc.device.ExecuteOperationRequest;
+import com.x.grpc.device.ExecuteOperationResponse;
+import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Dubbo设备服务客户端 - 使用Dubbo调用设备管理服务的gRPC接口
  */
 @Component
-public class DubboDeviceServiceClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(DubboDeviceServiceClient.class);
+public class DubboDeviceServiceClient extends BaseDubboServiceClient<DubboDeviceServiceGrpc.IDeviceService> {
 
     // 完善DubboReference配置，添加timeout、retries、cluster和loadbalance等参数
     @DubboReference(
@@ -37,35 +35,43 @@ public class DubboDeviceServiceClient {
      * @return 执行结果
      */
     public R<Map<String, Object>> executeOperation(String operation, Map<String, Object> params) {
-        try {
-            logger.debug("Calling device service executeOperation: {}", operation);
-            
-            // 构建请求对象
-            ExecuteOperationRequest.Builder requestBuilder = ExecuteOperationRequest.newBuilder()
-                    .setOperation(operation);
-            
-            // 添加参数
-            params.forEach((key, value) -> {
-                if (value != null) {
-                    requestBuilder.putParams(key, value.toString());
-                }
-            });
-            
-            // 调用服务
-            ExecuteOperationResponse response = deviceService.executeOperation(requestBuilder.build());
-            // 转换响应
-            Map<String, Object> data = new HashMap<>(response.getDataMap());
-            
-            if (response.getSuccess()) {
-                R.success(ResultCode.SUCCESS, response.getMessage());
-            } else {
-                response.getMessage();
+        return super.executeOperation(operation, params, deviceService, "device");
+    }
+
+    @Override
+    protected com.google.protobuf.GeneratedMessageV3.Builder<?> createRequestBuilder(String operation, Map<String, Object> params) {
+        ExecuteOperationRequest.Builder requestBuilder = ExecuteOperationRequest.newBuilder()
+                .setOperation(operation);
+        
+        // 添加参数
+        params.forEach((key, value) -> {
+            if (value != null) {
+                requestBuilder.putParams(key, value.toString());
             }
-            return R.data(data);
-        } catch (Exception e) {
-            logger.error("Failed to call device service executeOperation: {}", e.getMessage(), e);
-            return R.fail(ResultCode.INTERNAL_SERVER_ERROR, "Failed to execute operation: " + e.getMessage());
-        }
+        });
+        
+        return requestBuilder;
+    }
+
+    @Override
+    protected Object callService(DubboDeviceServiceGrpc.IDeviceService serviceStub, Message request) {
+        return serviceStub.executeOperation((ExecuteOperationRequest) request);
+    }
+
+    @Override
+    protected Map<String, Object> extractDataFromResponse(Object response) {
+        Map<String, String> originalData = ((ExecuteOperationResponse) response).getDataMap();
+        return new HashMap<>(originalData);
+    }
+
+    @Override
+    protected boolean isResponseSuccessful(Object response) {
+        return ((ExecuteOperationResponse) response).getSuccess();
+    }
+
+    @Override
+    protected String getResponseMessage(Object response) {
+        return ((ExecuteOperationResponse) response).getMessage();
     }
 
     // 通用的Dubbo服务调用与错误处理

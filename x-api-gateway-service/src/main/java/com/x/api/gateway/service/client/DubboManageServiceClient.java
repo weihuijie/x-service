@@ -2,9 +2,9 @@ package com.x.api.gateway.service.client;
 
 import com.google.protobuf.Message;
 import com.x.common.base.R;
-import com.x.grpc.auth.DubboAuthServiceGrpc;
-import com.x.grpc.auth.ExecuteOperationRequest;
-import com.x.grpc.auth.ExecuteOperationResponse;
+import com.x.grpc.manage.DubboManageServiceGrpc;
+import com.x.grpc.manage.ExecuteOperationRequest;
+import com.x.grpc.manage.ExecuteOperationResponse;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Component;
 
@@ -12,11 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Dubbo认证服务客户端 - 使用Dubbo调用认证服务的gRPC接口
- * 替代之前的Feign客户端，提供更高效的服务调用
+ * Dubbo管理服务客户端 - 使用Dubbo调用管理服务的gRPC接口
  */
 @Component
-public class DubboAuthServiceClient extends BaseDubboServiceClient<DubboAuthServiceGrpc.IAuthService> {
+public class DubboManageServiceClient extends BaseDubboServiceClient<DubboManageServiceGrpc.IManageService> {
 
     // 完善DubboReference配置，添加timeout、retries、cluster和loadbalance等参数
     @DubboReference(
@@ -25,18 +24,18 @@ public class DubboAuthServiceClient extends BaseDubboServiceClient<DubboAuthServ
             timeout = 3000,            // 超时时间3秒
             retries = 0,               // 不重试，避免重复操作
             cluster = "failfast",      // 快速失败
-            loadbalance = "consistenthash" // 一致性哈希负载均衡
+            loadbalance = "roundrobin" // 轮询负载均衡
     )
-    private DubboAuthServiceGrpc.IAuthService authService;
+    private DubboManageServiceGrpc.IManageService manageService;
 
     /**
-     * 执行操作 - 通用方法，将操作委托给认证服务内部处理
+     * 执行操作 - 通用方法，将操作委托给管理服务内部处理
      * @param operation 操作名称
      * @param params 参数
      * @return 执行结果
      */
     public R<Map<String, Object>> executeOperation(String operation, Map<String, Object> params) {
-        return super.executeOperation(operation, params, authService, "auth");
+        return super.executeOperation(operation, params, manageService, "manage");
     }
 
     @Override
@@ -55,13 +54,13 @@ public class DubboAuthServiceClient extends BaseDubboServiceClient<DubboAuthServ
     }
 
     @Override
-    protected Object callService(DubboAuthServiceGrpc.IAuthService serviceStub, Message request) {
+    protected Object callService(DubboManageServiceGrpc.IManageService serviceStub, Message request) {
         return serviceStub.executeOperation((ExecuteOperationRequest) request);
     }
 
     @Override
     protected Map<String, Object> extractDataFromResponse(Object response) {
-        Map<String, String> originalData = ((ExecuteOperationResponse) response).getDataMap();
+        Map<String, String> originalData = ((com.x.grpc.device.ExecuteOperationResponse) response).getDataMap();
         return new HashMap<>(originalData);
     }
 
@@ -84,7 +83,7 @@ public class DubboAuthServiceClient extends BaseDubboServiceClient<DubboAuthServ
         try {
             return call.call();
         } catch (Exception e) {
-            logger.error("Failed to call auth service {}: {}", operation, e.getMessage(), e);
+            logger.error("Failed to call manage service {}: {}", operation, e.getMessage(), e);
             return fallbackProvider.getFallback();
         }
     }

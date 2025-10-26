@@ -3,6 +3,7 @@ package com.x.api.gateway.service.config;
 import com.x.api.gateway.service.dispatcher.ServiceOperationRegistry;
 import com.x.api.gateway.service.dispatcher.operation.AuthServiceOperation;
 import com.x.api.gateway.service.dispatcher.operation.DeviceServiceOperation;
+import com.x.api.gateway.service.dispatcher.operation.ManageServiceOperation;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
@@ -16,13 +17,16 @@ public class ServiceOperationConfig {
     private final ServiceOperationRegistry operationRegistry;
     private final AuthServiceOperation authServiceOperation;
     private final DeviceServiceOperation deviceServiceOperation;
+    private final ManageServiceOperation manageServiceOperation;
     
     public ServiceOperationConfig(ServiceOperationRegistry operationRegistry, 
                                   AuthServiceOperation authServiceOperation,
-                                  DeviceServiceOperation deviceServiceOperation) {
+                                  DeviceServiceOperation deviceServiceOperation,
+                                  ManageServiceOperation manageServiceOperation) {
         this.operationRegistry = operationRegistry;
         this.authServiceOperation = authServiceOperation;
         this.deviceServiceOperation = deviceServiceOperation;
+        this.manageServiceOperation = manageServiceOperation;
     }
     
     @PostConstruct
@@ -32,5 +36,8 @@ public class ServiceOperationConfig {
         
         // 注册设备服务操作
         operationRegistry.registerOperation(deviceServiceOperation);
+        
+        // 注册管理服务操作
+        operationRegistry.registerOperation(manageServiceOperation);
     }
 }

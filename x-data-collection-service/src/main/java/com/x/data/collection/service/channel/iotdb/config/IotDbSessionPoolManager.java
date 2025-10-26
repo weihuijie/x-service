@@ -23,7 +23,7 @@ public class IotDbSessionPoolManager {
 
     private String host;
 
-    private int maxSize;
+    private int maxSize = 50; // 默认连接池大小
 
     private volatile SessionPool sessionPool;
 
@@ -46,6 +46,7 @@ public class IotDbSessionPoolManager {
             synchronized (this) {
                 if (sessionPool == null) {
                     sessionPool = new SessionPool(url, Integer.parseInt(host), username, password, maxSize);
+                    log.info("Initialized IoTDB SessionPool with max size: {}", maxSize);
                 }
             }
         }

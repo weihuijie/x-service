@@ -19,6 +19,12 @@
             <version>1.0.0</version>
         </dependency>
         
+        <!-- Spring Boot WebFlux依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        
         <!-- Dubbo gRPC接口定义 -->
         <dependency>
             <groupId>com.x</groupId>
@@ -46,6 +52,12 @@
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
+        <!-- 添加 gRPC Netty -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+        </dependency>
+
         <!-- Spring Cloud LoadBalancer负载均衡 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -61,6 +73,12 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+        </dependency>
+        
+        <!-- Resilience4j与Reactor集成 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
         </dependency>
 
         <!-- Redis限流 -->
@@ -85,6 +103,7 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
         </dependency>
+        
     </dependencies>
 
 </project>

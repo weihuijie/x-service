@@ -1,6 +1,7 @@
 package com.x.api.gateway.service.filter;
 
-import com.x.api.gateway.service.client.AuthServiceClient;
+import com.x.api.gateway.service.client.DubboAuthServiceClient;
+import com.x.common.base.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,9 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +42,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
     );
     
     @Autowired
-    private AuthServiceClient authServiceClient;
+    private DubboAuthServiceClient dubboAuthServiceClient;
     
     /**
      * 实现GlobalFilter接口的filter方法
@@ -75,28 +78,31 @@ public class AuthFilter implements GlobalFilter, Ordered {
         
         try {
             // 使用CompletableFuture异步调用认证服务，设置超时时间
-            CompletableFuture<AuthServiceClient.ValidateTokenResponse> future = CompletableFuture.supplyAsync(() -> {
-                return authServiceClient.validateToken(new AuthServiceClient.TokenRequest(token));
+            CompletableFuture<R<Map<String, Object>>> future = CompletableFuture.supplyAsync(() -> {
+                Map<String, Object> params = new HashMap<>();
+                params.put("token", token);
+                return dubboAuthServiceClient.executeOperation("validateToken", params);
             });
             
             // 处理异步结果，设置3秒超时
-            AuthServiceClient.ValidateTokenResponse response = future.get(3, TimeUnit.SECONDS);
+            R<Map<String, Object>> response = future.get(3, TimeUnit.SECONDS);
             
-            if (!response.isValid()) {
-                logger.warn("Token validation failed for path: {}, reason: {}", path, response.getMessage());
+            if (!response.isSuccess()) {
+                logger.warn("Token validation failed for path: {}, reason: {}", path, response.getMsg());
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
             
             // token有效，将用户信息添加到请求头中，继续过滤器链
+            Map<String, Object> data = response.getData();
             ServerHttpRequest request = exchange.getRequest().mutate()
-                    .header("X-User-Id", response.getUserId())
-                    .header("X-Username", response.getUsername())
-                    .header("X-User-Info", createUserInfoHeader(response))
+                    .header("X-User-Id", String.valueOf(data.get("userId")))
+                    .header("X-Username", String.valueOf(data.get("username")))
+                    .header("X-User-Info", createUserInfoHeader(data))
                     .build();
             
             logger.debug("Token validation successful for user: {} accessing path: {}", 
-                    response.getUsername(), path);
+                    data.get("username"), path);
             
             return chain.filter(exchange.mutate().request(request).build());
         } catch (InterruptedException e) {
@@ -129,9 +135,9 @@ public class AuthFilter implements GlobalFilter, Ordered {
     /**
      * 创建用户信息请求头
      */
-    private String createUserInfoHeader(AuthServiceClient.ValidateTokenResponse response) {
+    private String createUserInfoHeader(Map<String, Object> data) {
         // 实际应用中可能需要更复杂的用户信息
-        return "{\"userId\":\"" + response.getUserId() + "\",\"username\":\"" + response.getUsername() + "\"}";
+        return "{\"userId\":\"" + data.get("userId") + "\",\"username\":\"" + data.get("username") + "\"}";
     }
     
     /**

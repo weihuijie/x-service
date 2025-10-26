@@ -13,6 +13,8 @@ spring:
     host: 6667
     username: root
     password: root
+    # 增加IoTDB连接池配置
+    max-size: 50
 
 # gRPC配置
 grpc:

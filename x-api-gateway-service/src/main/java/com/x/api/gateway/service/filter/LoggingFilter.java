@@ -36,7 +36,7 @@ public class LoggingFilter implements GlobalFilter, Ordered {
         // 获取请求信息
         ServerHttpRequest request = exchange.getRequest();
         URI uri = request.getURI();
-        String method = request.getMethodValue();
+        String method = request.getMethod().name();
         String path = uri.getPath();
         String clientIp = request.getRemoteAddress() != null ? request.getRemoteAddress().getAddress().getHostAddress() : "unknown";
         

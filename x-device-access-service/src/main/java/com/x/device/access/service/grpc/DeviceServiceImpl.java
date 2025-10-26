@@ -6,6 +6,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import com.x.device.access.service.handler.DeviceAccessHandler;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -188,7 +189,7 @@ public class DeviceServiceImpl extends DeviceServiceGrpc.DeviceServiceImplBase {
             ListDevicesResponse response = ListDevicesResponse.newBuilder()
                     .setSuccess(true)
                     .setMessage("获取设备列表成功")
-                    .addAllDevices(devices)
+                    .addAllDevices(List.of(devices))
                     .setTotal(deviceStore.size())
                     .build();
             

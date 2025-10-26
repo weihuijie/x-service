@@ -1,11 +1,12 @@
 package com.x.api.gateway.service.filter;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -15,15 +16,14 @@ import java.util.List;
  * 自定义响应头过滤器工厂
  * 用于在响应中添加自定义头信息
  */
-@Component
-public class AddResponseHeaderGatewayFilterFactory extends AbstractGatewayFilterFactory<AddResponseHeaderGatewayFilterFactory.Config> {
+public class CustomAddResponseHeaderGatewayFilterFactory extends AbstractGatewayFilterFactory<CustomAddResponseHeaderGatewayFilterFactory.Config> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AddResponseHeaderGatewayFilterFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(CustomAddResponseHeaderGatewayFilterFactory.class);
     
     public static final String NAME_KEY = "name";
     public static final String VALUE_KEY = "value";
 
-    public AddResponseHeaderGatewayFilterFactory() {
+    public CustomAddResponseHeaderGatewayFilterFactory() {
         super(Config.class);
     }
 
@@ -34,7 +34,7 @@ public class AddResponseHeaderGatewayFilterFactory extends AbstractGatewayFilter
 
     @Override
     public GatewayFilter apply(Config config) {
-        logger.info("Creating AddResponseHeaderGatewayFilter with name: {}, value: {}", 
+        logger.info("Creating CustomAddResponseHeaderGatewayFilter with name: {}, value: {}", 
                 config.getName(), config.getValue());
         
         return (exchange, chain) -> {
@@ -59,24 +59,11 @@ public class AddResponseHeaderGatewayFilterFactory extends AbstractGatewayFilter
     /**
      * 配置类
      */
+    @Setter
+    @Getter
     public static class Config {
         private String name;
         private String value;
 
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
     }
 }
