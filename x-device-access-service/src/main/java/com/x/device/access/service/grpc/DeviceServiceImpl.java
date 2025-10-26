@@ -5,6 +5,8 @@ import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import com.x.device.access.service.handler.DeviceAccessHandler;
 
+import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @GrpcService
+@Service
 public class DeviceServiceImpl extends DeviceServiceGrpc.DeviceServiceImplBase {
     
     private final DeviceAccessHandler deviceHandler = new DeviceAccessHandler();

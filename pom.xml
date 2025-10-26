@@ -70,7 +70,7 @@
 
         <!-- 微服务相关版本 -->
         <spring-cloud.version>2023.0.1</spring-cloud.version>
-        <nacos.version>0.3.0-RC</nacos.version>
+        <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
         <grpc.version>1.66.0</grpc.version>
         <protobuf.version>3.24.0</protobuf.version>
         <dubbo.version>3.3.0</dubbo.version>
@@ -84,7 +84,6 @@
         <flink.version>1.16.1</flink.version>
 
         <!-- 其他服务版本 -->
-        <oauth2.version>11.8</oauth2.version>
         <xxl-job.version>2.3.1</xxl-job.version>
         <minio.version>8.5.1</minio.version>
 
@@ -116,6 +115,12 @@
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
             </dependency>
 
             <!-- 数据库相关依赖 -->
@@ -289,12 +294,6 @@
                 <artifactId>flink-streaming-java</artifactId>
                 <version>${flink.version}</version>
             </dependency>
-            <!-- OAuth2认证 -->
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-oauth2-jose</artifactId>
-                <version>${oauth2.version}</version>
-            </dependency>
 
             <!-- 对象存储 -->
             <dependency>
@@ -324,11 +323,16 @@
                 <version>4.1.90.Final</version>
             </dependency>
 
-            <!-- 配置中心 -->
+            <!-- Nacos服务发现 -->
             <dependency>
-                <groupId>com.alibaba.boot</groupId>
-                <artifactId>nacos-config-spring-boot-starter</artifactId>
-                <version>${nacos.version}</version>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
             </dependency>
 
             <!-- 任务调度 -->

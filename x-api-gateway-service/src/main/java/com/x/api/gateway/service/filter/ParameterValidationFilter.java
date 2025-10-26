@@ -22,13 +22,13 @@ import java.util.Map;
 public class ParameterValidationFilter implements GlobalFilter, Ordered {
 
     private static final Logger logger = LoggerFactory.getLogger(ParameterValidationFilter.class);
-    
+
     // 敏感字符列表，用于检测潜在的恶意输入
     private static final List<String> SENSITIVE_PATTERNS = List.of(
-        "<script", "javascript:", "vbscript:", "onload", "onerror", 
+        "<script", "javascript:", "vbscript:", "onload", "onerror",
         "alert(", "eval(", "expression(", "data:"
     );
-    
+
     // 需要跳过校验的路径
     private static final List<String> SKIP_PATHS = List.of(
         "/health", "/actuator", "/swagger-ui", "/v3/api-docs"
@@ -38,12 +38,12 @@ public class ParameterValidationFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, org.springframework.cloud.gateway.filter.GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
-        
+
         // 检查是否需要跳过校验
         if (shouldSkipValidation(path)) {
             return chain.filter(exchange);
         }
-        
+
         // 校验查询参数
         if (hasSensitiveContent(request.getQueryParams())) {
             logger.warn("Potential malicious query parameters detected in request: {}", path);
@@ -54,7 +54,7 @@ public class ParameterValidationFilter implements GlobalFilter, Ordered {
                 Mono.just(exchange.getResponse().bufferFactory().wrap(bytes))
             );
         }
-        
+
         // 校验路径参数
         if (hasSensitiveContentInPath(path)) {
             logger.warn("Potential malicious content detected in request path: {}", path);
@@ -65,7 +65,7 @@ public class ParameterValidationFilter implements GlobalFilter, Ordered {
                 Mono.just(exchange.getResponse().bufferFactory().wrap(bytes))
             );
         }
-        
+
         return chain.filter(exchange);
     }
 

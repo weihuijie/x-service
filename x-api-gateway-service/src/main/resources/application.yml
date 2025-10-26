@@ -1,15 +1,12 @@
 server:
   port: 9000
-  servlet:
-    context-path: /api-gateway
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/plain,text/css,application/javascript
 
 spring:
   application:
-    name: api-gateway-service
-    
+    name: x-api-gateway-service
   cloud:
     gateway:
       # 启用熔断
@@ -24,40 +21,36 @@ spring:
           predicates:
             - Path=/manage/**
           filters:
-            - StripPrefix=1
+
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
-                key-resolver: '#{@userKeyResolver}'
             - name: CircuitBreaker
               args:
                 name: manageServiceCircuitBreaker
                 fallbackUri: forward:/fallback/manage
         - id: device-service
-          uri: lb://x-device-access-service
+          uri: http://127.0.0.1:8083
           predicates:
             - Path=/device/**
-            - Method=GET,POST
           filters:
-            - StripPrefix=1
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 20
                 redis-rate-limiter.burstCapacity: 40
-                key-resolver: '#{@userKeyResolver}'
         - id: auth-service
           uri: lb://x-auth-service
           predicates:
             - Path=/auth/**
           filters:
-            - StripPrefix=1
+
         - id: file-service
           uri: lb://x-file-service
           predicates:
             - Path=/file/**
           filters:
-            - StripPrefix=1
+
             - name: AddResponseHeader
               args:
                 name: X-Response-Time
@@ -67,55 +60,65 @@ spring:
           predicates:
             - Path=/alert/**
           filters:
-            - StripPrefix=1
+
         - id: data-service
           uri: lb://x-data-collection-service
           predicates:
             - Path=/data/**
           filters:
-            - StripPrefix=1
+
         - id: config-service
           uri: lb://x-config-center-service
           predicates:
             - Path=/config/**
           filters:
-            - StripPrefix=1
+
         - id: repository-service
           uri: lb://x-repository-service
           predicates:
             - Path=/repository/**
           filters:
-            - StripPrefix=1
+
         - id: offline-analysis-service
           uri: lb://x-offline-analysis-service
           predicates:
             - Path=/offline-analysis/**
           filters:
-            - StripPrefix=1
+
         - id: realtime-analysis-service
           uri: lb://x-realtime-analysis-service
           predicates:
             - Path=/realtime-analysis/**
           filters:
-            - StripPrefix=1
+
         - id: task-scheduler-service
           uri: lb://x-task-scheduler-service
           predicates:
             - Path=/task/**
           filters:
-            - StripPrefix=1
-        - id: swagger-ui
-          uri: http://localhost:9000
+
+        # 添加默认路由，处理API网关内部的API请求
+        - id: api-gateway-internal
+          uri: lb://x-api-gateway-service
           predicates:
-            - Path=/swagger-ui/**
-        - id: api-docs
-          uri: http://localhost:9000
-          predicates:
-            - Path=/v3/api-docs/**
+            - Path=/api-gateway/api/**
+          filters:
+
     # 负载均衡配置
     loadbalancer:
       ribbon:
         enabled: false
+    # Nacos服务发现配置
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: public
+        group: DEFAULT_GROUP
+      config:
+        # 配置中心地址
+        server-addr: 127.0.0.1:8848
+        # 配置文件格式
+        file-extension: yml
   # Redis配置
   data:
     redis:
@@ -123,19 +126,6 @@ spring:
       port: 6379
       database: 0
       timeout: 2000ms
-
-# Dubbo配置
-dubbo:
-  application:
-    name: ${spring.application.name}
-  registry:
-    address: nacos://nacos:nacos@127.0.0.1:8848
-  config-center:
-    address: nacos://nacos:nacos@127.0.0.1:8848
-    config-file: dubbo.properties
-  protocol:
-    name: grpc
-    port: -1
 
 # 熔断器配置
 resilience4j:
@@ -174,15 +164,3 @@ logging:
   level:
     com.x.api.gateway.service: debug
     org.springframework.cloud.gateway: info
-    reactor.netty.http.client: info
-
-# OpenAPI配置
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
-
-# 添加新路由配置
-# 增加追踪配置

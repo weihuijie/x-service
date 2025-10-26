@@ -3,7 +3,6 @@ package com.x.api.gateway.service;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
  * API网关服务入口类
@@ -11,7 +10,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @SpringBootApplication
 @EnableDiscoveryClient  // 启用服务发现
-@EnableFeignClients     // 启用Feign客户端
 public class ApiGatewayServiceApplication {
     
     /**

@@ -10,6 +10,7 @@
 2. **设备数据处理**：接收和处理设备发送的数据
 3. **设备状态管理**：管理设备的状态信息
 4. **gRPC服务**：提供高性能的gRPC接口供API网关调用
+5. **REST API服务**：提供标准的RESTful API接口
 
 ## 技术栈
 
@@ -30,6 +31,8 @@ src/main/java/com/x/device/access/service/
 │   └── DeviceAccessHandler.java        # 设备接入处理器
 ├── grpc/
 │   └── DeviceServiceImpl.java          # gRPC服务实现
+├── controller/
+│   └── DeviceController.java           # REST API控制器
 ```
 
 ## 配置说明
@@ -97,6 +100,10 @@ netty:
    - 方法：`rpc ExecuteOperation (ExecuteOperationRequest) returns (ExecuteOperationResponse);`
    - 功能：通用操作执行接口，支持动态调用各种设备操作
 
+## REST API接口
+
+设备接入服务还提供了一套完整的REST API接口，详情请参考 [REST API文档](REST_API.md)。
+
 ## 使用方法
 
 ### 启动服务
@@ -112,6 +119,7 @@ java -jar x-device-access-service-1.0.0.jar
 ### 访问服务
 
 - RESTful服务默认监听端口：8083
+  - 设备管理API: http://localhost:8083/device
 - gRPC服务默认监听端口：9093
 - Netty服务默认监听端口：8000
 

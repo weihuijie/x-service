@@ -1,5 +1,7 @@
 package com.x.api.gateway.service.predicate;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
 import org.springframework.cloud.gateway.handler.predicate.GatewayPredicate;
 import org.springframework.stereotype.Component;
@@ -71,33 +73,12 @@ public class QueryParamRoutePredicateFactory extends AbstractRoutePredicateFacto
     /**
      * 配置类
      */
+    @Setter
+    @Getter
     public static class Config {
         private String paramName;
         private String paramValue;
         private boolean required = true;
 
-        public String getParamName() {
-            return paramName;
-        }
-
-        public void setParamName(String paramName) {
-            this.paramName = paramName;
-        }
-
-        public String getParamValue() {
-            return paramValue;
-        }
-
-        public void setParamValue(String paramValue) {
-            this.paramValue = paramValue;
-        }
-
-        public boolean isRequired() {
-            return required;
-        }
-
-        public void setRequired(boolean required) {
-            this.required = required;
-        }
     }
 }
