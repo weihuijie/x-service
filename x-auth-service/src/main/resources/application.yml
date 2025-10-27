@@ -3,22 +3,27 @@ server:
 
 spring:
   application:
-    name: auth-service
+    name: x-auth-service
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/x_auth?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: root
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
 
-# gRPC配置
-grpc:
-  server:
-    port: 9092
-
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.x.auth.service.entity
 
 logging:
   level:
     com.x.auth.service: debug
+# Dubbo配置
+dubbo:
+  application:
+    name: ${spring.application.name}
+  registry:
+    address: nacos://nacos:nacos@127.0.0.1:8848
+  protocol:
+    name: grpc
+    port: -1
