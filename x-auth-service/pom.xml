@@ -12,6 +12,11 @@
     <artifactId>x-auth-service</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.x</groupId>
+            <artifactId>x-common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -64,9 +69,8 @@
 
         <!-- MySQL驱动 -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>runtime</scope>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
         <!-- 测试依赖 -->

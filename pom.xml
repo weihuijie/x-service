@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.x</groupId> <!-- 当前项目组织 -->
-    <artifactId>x</artifactId> <!-- 当前项目名称 -->
+    <artifactId>x-service</artifactId> <!-- 当前项目名称 -->
     <version>1.0.0</version> <!-- 项目的版本号。0.0.1-SNAPSHOT 表示这是一个正在开发中的快照版本。-->
-    <name>x</name>
+    <name>x-service</name>
     <url>/</url>
     <description>x微服务架构</description>
 
@@ -482,15 +482,6 @@
     </repositories>
 
     <pluginRepositories> <!-- 声明 Maven 插件（即 <plugins> 中定义的工具）从哪些仓库下载 -->
-        <pluginRepository>
-            <id>local</id>
-            <name>本地</name>
-            <url>file://D:/soft/Repository</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-
         <pluginRepository>
             <id>public</id>
             <name>阿里云公共仓库</name>
