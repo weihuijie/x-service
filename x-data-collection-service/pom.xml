@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>x</artifactId>
+        <artifactId>x-service</artifactId>
         <groupId>com.x</groupId>
         <version>1.0.0</version>
     </parent>
@@ -19,6 +19,13 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- gRPC依赖 -->
+        <dependency>
+            <groupId>com.x</groupId>
+            <artifactId>x-dubbo-grpc</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Spring Boot Web依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -29,24 +36,6 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-        </dependency>
-
-        <!-- gRPC依赖 -->
-        <dependency>
-            <groupId>com.x</groupId>
-            <artifactId>x-dubbo-grpc</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>net.devh</groupId>
-            <artifactId>grpc-server-spring-boot-starter</artifactId>
-        </dependency>
-
-        <!-- Dubbo依赖 -->
-        <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-spring-boot-starter</artifactId>
         </dependency>
 
         <!-- Zookeeper依赖 -->
@@ -89,24 +78,4 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.dubbo</groupId>
-                <artifactId>dubbo-bom</artifactId>
-                <version>3.2.5</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>

@@ -5,25 +5,20 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
 /**
- * @author: weihuijie
+ * @author: whj
  *  mybatis拦截器，自动注入创建人、创建时间、修改人、修改时间
  *
  */
 @Slf4j
 @Component
 public class MetaObjectHandlerConfig implements MetaObjectHandler {
-
-    @Autowired
-    private HttpServletRequest request;
 
     @Override
     public void insertFill(MetaObject metaObject) {

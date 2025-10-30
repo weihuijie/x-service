@@ -24,11 +24,11 @@ public class Query {
 	/**
 	 * 正排序规则
 	 */
-	private String ascs;
+	private String asc;
 
 	/**
 	 * 倒排序规则
 	 */
-	private String descs;
+	private String desc;
 
 }

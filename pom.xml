@@ -6,7 +6,7 @@
 
     <groupId>com.x</groupId> <!-- 当前项目组织 -->
     <artifactId>x-service</artifactId> <!-- 当前项目名称 -->
-    <version>1.0.0</version> <!-- 项目的版本号。0.0.1-SNAPSHOT 表示这是一个正在开发中的快照版本。-->
+    <version>1.0.0</version> <!-- 项目的版本号-->
     <name>x-service</name>
     <url>/</url>
     <description>x微服务架构</description>
@@ -39,11 +39,12 @@
 
         <!-- 基础工具类版本 -->
         <mybatis-spring-boot.version>3.0.2</mybatis-spring-boot.version>
-        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <druid.version>1.2.20</druid.version>
         <bitwalker.version>1.21</bitwalker.version>
         <springdoc.version>2.1.0</springdoc.version>
+        <knife4j.version>4.4.0</knife4j.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <pagehelper.boot.version>1.4.7</pagehelper.boot.version>
         <fastjson.version>2.0.43</fastjson.version>
@@ -123,16 +124,9 @@
                 <version>${spring-cloud-alibaba.version}</version>
             </dependency>
 
-            <!-- 数据库相关依赖 -->
-            <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis-spring-boot.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
@@ -369,19 +363,6 @@
                 <version>${protobuf.version}</version>
             </dependency>
 
-            <!-- gRPC Spring Boot Starter -->
-            <dependency>
-                <groupId>net.devh</groupId>
-                <artifactId>grpc-server-spring-boot-starter</artifactId>
-                <version>2.14.0.RELEASE</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.devh</groupId>
-                <artifactId>grpc-client-spring-boot-starter</artifactId>
-                <version>2.14.0.RELEASE</version>
-            </dependency>
-
             <!-- Dubbo相关依赖 -->
             <dependency>
                 <groupId>org.apache.dubbo</groupId>
@@ -392,15 +373,15 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.dubbo</groupId>
-                <artifactId>dubbo-spring-boot-starter</artifactId>
-                <version>${dubbo.version}</version>
+                <groupId>net.devh</groupId>
+                <artifactId>grpc-client-spring-boot-starter</artifactId>
+                <version>2.14.0.RELEASE</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.dubbo</groupId>
-                <artifactId>dubbo-nacos-spring-boot-starter</artifactId>
-                <version>${dubbo.version}</version>
+                <groupId>net.devh</groupId>
+                <artifactId>grpc-server-spring-boot-starter</artifactId>
+                <version>2.14.0.RELEASE</version>
             </dependency>
 
             <!-- Zookeeper依赖 -->
@@ -421,6 +402,12 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
                 <version>${springdoc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
