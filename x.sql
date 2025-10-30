@@ -11,7 +11,7 @@
  Target Server Version : 50744 (5.7.44)
  File Encoding         : 65001
 
- Date: 29/10/2025 16:29:11
+ Date: 30/10/2025 16:21:55
 */
 
 SET NAMES utf8mb4;
@@ -22,7 +22,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `device_info`;
 CREATE TABLE `device_info`  (
-  `id` bigint(20) NOT NULL COMMENT '设备ID',
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '设备ID',
   `device_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '设备名称',
   `device_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '设备编码',
   `plc_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'PLC编码',
@@ -34,10 +34,12 @@ CREATE TABLE `device_info`  (
   `status` int(11) NULL DEFAULT NULL COMMENT '钢板状态 0 等待 1 完成 2 执行中 3 异常',
   `is_deleted` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否已删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '设备表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '设备表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of device_info
 -- ----------------------------
+INSERT INTO `device_info` VALUES (1, '电铲1号', 'shovel001', 'shovle_plc', NULL, '2025-10-30 15:49:07', 'system', '2025-10-30 16:14:06', 'system', NULL, 0);
+INSERT INTO `device_info` VALUES (2, '电铲1号', 'shovel001', 'shovle_plc', NULL, '2025-10-30 16:02:05', 'system', '2025-10-30 16:12:12', 'system', NULL, 1);
 
 SET FOREIGN_KEY_CHECKS = 1;
