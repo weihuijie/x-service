@@ -74,12 +74,6 @@
             <artifactId>hutool-all</artifactId>
         </dependency>
 
-        <!-- Nacos服务发现 -->
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-        </dependency>
-
         <!-- 监控和度量相关依赖 -->
         <dependency>
             <groupId>io.micrometer</groupId>

@@ -25,10 +25,10 @@
     <file url="file://$PROJECT_DIR$/x-device-access-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-device-manage-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-device-manage-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-dubbo-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-dubbo-api/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-dubbo-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-dubbo-common/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/x-dubbo-grpc/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/x-dubbo-grpc/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-file-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-file-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-manage-service/src/main/java" charset="UTF-8" />

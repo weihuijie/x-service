@@ -19,20 +19,22 @@
 - gRPC
 - Redis
 - MongoDB
+- Nacos
 
 ## 项目结构
 
 ```
 src/main/java/com/x/device/access/service/
-├── DeviceAccessServiceApplication.java  # 应用入口
+├── DeviceAccessServiceApplication.java    # 应用入口
 ├── config/
-│   └── GrpcConfig.java                 # gRPC配置
+│   └── GrpcConfig.java                   # gRPC配置
 ├── handler/
-│   └── DeviceAccessHandler.java        # 设备接入处理器
+│   └── DeviceAccessHandler.java          # 设备接入处理器
 ├── grpc/
-│   └── DeviceServiceImpl.java          # gRPC服务实现
+│   ├── DeviceServiceImpl.java            # gRPC服务实现
+│   └── DeviceServiceTestController.java  # gRPC测试控制器
 ├── controller/
-│   └── DeviceController.java           # REST API控制器
+│   └── DeviceController.java             # REST API控制器
 ```
 
 ## 配置说明
@@ -72,6 +74,18 @@ netty:
   port: 8000
 ```
 
+4. **Dubbo配置**
+```yaml
+dubbo:
+  application:
+    name: ${spring.application.name}
+  registry:
+    address: nacos://nacos:nacos@127.0.0.1:8848
+  protocol:
+    name: grpc
+    port: -1
+```
+
 ## gRPC接口
 
 ### 设备服务接口
@@ -100,9 +114,34 @@ netty:
    - 方法：`rpc ExecuteOperation (ExecuteOperationRequest) returns (ExecuteOperationResponse);`
    - 功能：通用操作执行接口，支持动态调用各种设备操作
 
+### Dubbo gRPC支持
+
+设备服务同时支持通过Dubbo gRPC调用，其他服务可以通过Dubbo注解方式引用该服务：
+
+```java
+@DubboReference(version = "1.0.0")
+private DeviceServiceGrpc.DeviceServiceBlockingStub deviceService;
+```
+
+**注意**: 服务注册与发现使用Nacos作为注册中心，确保Nacos服务正常运行。
+
 ## REST API接口
 
 设备接入服务还提供了一套完整的REST API接口，详情请参考 [REST API文档](REST_API.md)。
+
+## gRPC测试接口
+
+为了方便测试Dubbo gRPC调用，项目还提供了以下测试接口：
+
+1. **测试创建设备**
+   - 接口：`GET /test/grpc/createDevice`
+   - 功能：测试通过Dubbo gRPC创建设备
+
+2. **测试获取设备列表**
+   - 接口：`GET /test/grpc/listDevices`
+   - 功能：测试通过Dubbo gRPC获取设备列表
+
+**注意**: 测试前确保Nacos注册中心正常运行，设备服务已成功注册到Nacos。
 
 ## 使用方法
 
@@ -115,6 +154,12 @@ mvn spring-boot:run
 # 或使用打包后的jar文件
 java -jar x-device-access-service-1.0.0.jar
 ```
+
+### 启动前准备
+
+1. 确保Nacos服务正常运行，默认地址: http://127.0.0.1:8848
+2. 确保MongoDB服务正常运行
+3. 确保Redis服务正常运行
 
 ### 访问服务
 

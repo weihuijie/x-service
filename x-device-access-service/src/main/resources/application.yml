@@ -45,10 +45,6 @@ mybatis-plus:
         logic-not-delete-value: 0
         #逻辑未删除值,(逻辑删除下有效)
         logic-delete-value: 1
-# gRPC配置
-grpc:
-  server:
-    port: 9093
 
 logging:
   level:
@@ -56,10 +52,16 @@ logging:
 
 # Dubbo配置
 dubbo:
+  consumer:
+    check: false # 禁用启动检测
+    lazy: true   # 全局延迟注入，避免时机冲突
   application:
     name: ${spring.application.name}
+    logger: slf4j
   registry:
     address: nacos://nacos:nacos@127.0.0.1:8848
-  protocol:
-    name: grpc
-    port: -1
+    register-mode: instance
+  protocols:
+    tri-id:
+      name: tri
+      port: -1

@@ -9,21 +9,16 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>x-manage-service</artifactId>
-    <description>应用交互中间层</description>
+    <artifactId>x-dubbo-api</artifactId>
+
+    <properties>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.x</groupId>
-            <artifactId>x-common</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.x</groupId>
-            <artifactId>x-dubbo-api</artifactId>
+            <artifactId>x-repository-service</artifactId>
             <version>1.0.0</version>
         </dependency>
     </dependencies>
-
 </project>

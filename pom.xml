@@ -15,7 +15,7 @@
 
     <modules><!-- 子项目 -->
         <module>x-common</module>
-        <module>x-dubbo-grpc</module>
+        <module>x-dubbo-api</module>
         <module>x-manage-service</module>
         <module>x-repository-service</module>
         <module>x-config-center-service</module>

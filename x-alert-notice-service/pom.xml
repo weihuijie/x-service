@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>com.x</groupId>
-            <artifactId>x-dubbo-grpc</artifactId>
+            <artifactId>x-dubbo-api</artifactId>
             <version>${version}</version>
         </dependency>
 

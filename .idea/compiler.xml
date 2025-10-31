@@ -15,6 +15,7 @@
         <module name="x-realtime-analysis-service" />
         <module name="x-manage-service" />
         <module name="x-demo-service" />
+        <module name="x-dubbo-api" />
         <module name="x-repository-service" />
         <module name="x-alert-notice-service" />
         <module name="x-device-access-service" />
@@ -22,7 +23,6 @@
         <module name="x-data-collection-service" />
         <module name="x-data-sync-service" />
         <module name="x-api-gateway-service" />
-        <module name="x-dubbo-grpc" />
       </profile>
     </annotationProcessing>
   </component>

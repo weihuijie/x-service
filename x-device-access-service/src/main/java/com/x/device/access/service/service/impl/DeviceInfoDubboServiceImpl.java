@@ -1,27 +1,35 @@
-package com.x.device.access.service.controller;
+package com.x.device.access.service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.x.common.base.Query;
 import com.x.common.base.R;
+import com.x.dubbo.api.device.IDeviceInfoDubboService;
 import com.x.repository.service.entity.DeviceInfoEntity;
 import com.x.repository.service.service.IDeviceInfoService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ *  服务实现类
+ *
+ */
+@Slf4j
 @RestController
 @RequestMapping("/device")
-public class DeviceInfoController {
-    
+@DubboService(version = "1.0.0")
+public class DeviceInfoDubboServiceImpl implements IDeviceInfoDubboService {
+
     private final IDeviceInfoService deviceInfoService;
 
-    public DeviceInfoController(IDeviceInfoService deviceInfoService) {
+    public DeviceInfoDubboServiceImpl(IDeviceInfoService deviceInfoService) {
         this.deviceInfoService = deviceInfoService;
     }
-
     /**
      * 分页
      */
@@ -51,6 +59,7 @@ public class DeviceInfoController {
      */
     @GetMapping("/detail")
     public R<DeviceInfoEntity> detail(@RequestParam(name = "id") Long id) {
+        log.info("id:{}", id);
         DeviceInfoEntity detail = deviceInfoService.getById(id);
         return R.data(detail);
     }

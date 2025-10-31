@@ -32,7 +32,7 @@
         <!-- x-dubbo-grpc模块 -->
         <dependency>
             <groupId>com.x</groupId>
-            <artifactId>x-dubbo-grpc</artifactId>
+            <artifactId>x-dubbo-api</artifactId>
             <version>1.0.0</version>
         </dependency>
 
