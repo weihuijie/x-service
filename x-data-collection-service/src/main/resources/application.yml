@@ -24,3 +24,9 @@ grpc:
 logging:
   level:
     com.x.data.collection.service: debug
+
+
+plc-os:
+  ip: 192.168.1.1
+  bizLog: true
+  mock: true

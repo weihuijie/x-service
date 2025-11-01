@@ -95,6 +95,9 @@
         
         <!-- Zookeeper版本 -->
         <curator.version>5.2.0</curator.version>
+
+        <!-- http-->
+        <retrofit.version>3.2.0</retrofit.version>
     </properties>
 
     <!-- 依赖声明 子模块可以继承这些依赖-->
@@ -408,6 +411,19 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.lianjiatech</groupId>
+                <artifactId>retrofit-spring-boot-starter</artifactId>
+                <version>${retrofit.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.2</version>
+                <scope>compile</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
