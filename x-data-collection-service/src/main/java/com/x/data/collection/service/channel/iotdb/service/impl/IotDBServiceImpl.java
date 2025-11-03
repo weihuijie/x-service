@@ -6,7 +6,7 @@ import com.x.data.collection.service.channel.iotdb.config.IotDbSessionPoolManage
 import com.x.data.collection.service.channel.iotdb.dto.*;
 import com.x.data.collection.service.channel.iotdb.service.IotDBService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.iotdb.isession.SessionDataSet;
 import org.apache.iotdb.isession.pool.SessionDataSetWrapper;
@@ -33,7 +33,7 @@ public class IotDBServiceImpl implements IotDBService {
     @Override
     public List<RealtimeValueDto> realtime(String db, String device, List<String> points) {
         //如果请求为空 直接返回null
-        if (StringUtils.isEmpty(db) || StringUtils.isEmpty(device) || CollectionUtils.isEmpty(points)) {
+        if (ObjectUtils.isEmpty(db) || StringUtils.isEmpty(device) || ObjectUtils.isEmpty(points)) {
             return Collections.emptyList();
         }
 
@@ -60,7 +60,7 @@ public class IotDBServiceImpl implements IotDBService {
     @Override
     public List<AvgValueDto> avgValue(String device, List<String> points, Long startTime, Long endTime) {
         //如果请求为空 直接返回null
-        if (StringUtils.isEmpty(device) || CollectionUtils.isEmpty(points)) {
+        if (StringUtils.isEmpty(device) || ObjectUtils.isEmpty(points)) {
             return Collections.emptyList();
         }
 
@@ -97,7 +97,7 @@ public class IotDBServiceImpl implements IotDBService {
     @Override
     public List<StatisticsValueDto> statisticsValue(String device, List<String> points, Long startTime, Long endTime) {
         //如果请求为空 直接返回null
-        if (StringUtils.isEmpty(device) || CollectionUtils.isEmpty(points)) {
+        if (StringUtils.isEmpty(device) || ObjectUtils.isEmpty(points)) {
             return Collections.emptyList();
         }
 
@@ -133,7 +133,7 @@ public class IotDBServiceImpl implements IotDBService {
     @Override
     public List<SumValueDto> sumValue(String device, List<String> points, Long startTime, Long endTime) {
         //如果请求为空 直接返回null
-        if (StringUtils.isEmpty(device) || CollectionUtils.isEmpty(points)) {
+        if (StringUtils.isEmpty(device) || ObjectUtils.isEmpty(points)) {
             return Collections.emptyList();
         }
 
@@ -170,7 +170,7 @@ public class IotDBServiceImpl implements IotDBService {
     @Override
     public HistoryValuesDto historyData(String device, List<String> points, Integer page, Integer pageSize, Long startTime, Long endTime) {
         // 如果请求为空，直接返回null
-        if (StringUtils.isEmpty(device) || CollectionUtils.isEmpty(points) || page == null || pageSize == null) {
+        if (StringUtils.isEmpty(device) || ObjectUtils.isEmpty(points) || page == null || pageSize == null) {
             return null;
         }
 
@@ -244,7 +244,7 @@ public class IotDBServiceImpl implements IotDBService {
     @Override
     public HistoryValuesDto windowAggHistoryData(String device, List<String> points, Integer page, Integer pageSize, Long startTime, Long endTime, Integer windowSize, String interval) {
         // 如果请求为空，直接返回null
-        if (StringUtils.isEmpty(device) || CollectionUtils.isEmpty(points) || page == null || pageSize == null || windowSize == null || StringUtils.isEmpty(interval)) {
+        if (StringUtils.isEmpty(device) || ObjectUtils.isEmpty(points) || page == null || pageSize == null || windowSize == null || StringUtils.isEmpty(interval)) {
             return null;
         }
 
@@ -393,7 +393,7 @@ public class IotDBServiceImpl implements IotDBService {
 
     @Override
     public List<BatchRealtimeValueDto> batchRealtime(List<String> deviceIds, List<String> points) {
-        if (CollectionUtils.isEmpty(deviceIds) || CollectionUtils.isEmpty(points)) {
+        if (ObjectUtils.isEmpty(deviceIds) || ObjectUtils.isEmpty(points)) {
             return Collections.emptyList();
         }
 
@@ -442,7 +442,7 @@ public class IotDBServiceImpl implements IotDBService {
     @Override
     public BatchHistoryValuesDto batchHistoryData(List<String> deviceIds, List<String> points, Integer page, Integer pageSize, Long startTime, Long endTime) {
         // 如果请求为空，直接返回null
-        if (CollectionUtils.isEmpty(deviceIds) || CollectionUtils.isEmpty(points) || page == null || pageSize == null) {
+        if (ObjectUtils.isEmpty(deviceIds) || ObjectUtils.isEmpty(points) || page == null || pageSize == null) {
             return null;
         }
 
@@ -530,7 +530,7 @@ public class IotDBServiceImpl implements IotDBService {
     @Override
     public BatchHistoryValuesDto batchWindowAggHistoryData(List<String> deviceIds, List<String> points, Integer page, Integer pageSize, Long startTime, Long endTime, Integer windowSize, String interval) {
         // 如果请求为空，直接返回null
-        if (CollectionUtils.isEmpty(deviceIds) || CollectionUtils.isEmpty(points) || page == null || pageSize == null || windowSize == null || interval == null) {
+        if (ObjectUtils.isEmpty(deviceIds) || ObjectUtils.isEmpty(points) || page == null || pageSize == null || windowSize == null || interval == null) {
             return null;
         }
 
@@ -626,7 +626,7 @@ public class IotDBServiceImpl implements IotDBService {
     @Override
     public List<DeviceConditionDto> conditionDevice(List<String> deviceIds, List<String> points, Long startTime, Long endTime, String sql) {
         // 如果请求为空，直接返回null
-        if (CollectionUtils.isEmpty(deviceIds) || CollectionUtils.isEmpty(points)) {
+        if (ObjectUtils.isEmpty(deviceIds) || ObjectUtils.isEmpty(points)) {
             return null;
         }
         // 构建查询语句

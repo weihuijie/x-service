@@ -2,9 +2,7 @@ package com.x.data.collection.service.grpc;
 
 import com.x.grpc.data.*;
 import io.grpc.stub.StreamObserver;
-import net.devh.boot.grpc.server.service.GrpcService;
 
-@GrpcService
 public class DataServiceImpl extends DataServiceGrpc.DataServiceImplBase {
     
     @Override

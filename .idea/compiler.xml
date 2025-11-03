@@ -25,5 +25,8 @@
         <module name="x-api-gateway-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="x-dubbo-grpc" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
