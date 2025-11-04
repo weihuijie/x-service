@@ -48,7 +48,7 @@ public class DeviceInfoDubboServiceImpl implements IDeviceInfoDubboService {
      */
     @ResponseBody
     @PostMapping("/list/all")
-    public R list(@RequestBody DeviceInfoEntity device) {
+    public R<List<DeviceInfoEntity>> list(@RequestBody DeviceInfoEntity device) {
         QueryWrapper<DeviceInfoEntity> condition = new QueryWrapper<>(device);
         List<DeviceInfoEntity> list = deviceInfoService.list(condition);
         return R.data(list);

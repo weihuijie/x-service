@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 public interface IDeviceInfoDubboService {
 
     /**
@@ -19,7 +21,7 @@ public interface IDeviceInfoDubboService {
     /**
      * 不分页
      */
-    R list(@RequestBody DeviceInfoEntity device);
+    R<List<DeviceInfoEntity>> list(@RequestBody DeviceInfoEntity device);
 
     /**
      * 详情

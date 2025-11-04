@@ -30,3 +30,17 @@ plc-os:
   ip: 192.168.1.1
   bizLog: true
   mock: true
+
+xxl:
+  job:
+    admin:
+      addresses: http://127.0.0.1:8180/xxl-job-admin
+      accessToken: default_token
+      timeout: 3
+    executor:
+      appname: ${spring.application.name}
+      address:
+      ip:
+      port: 9998
+      logpath: "D:\\soft\\xxl-job\\log"
+      logretentiondays: 30
