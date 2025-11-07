@@ -32,7 +32,7 @@ public class FlinkDataProcessor {
     private RabbitMQConfigProperties rabbitMQConfig;
 
     // 定义阈值，用于检测异常数据
-    private static final double TEMPERATURE_THRESHOLD = 80.0;
+    private static final double TEMPERATURE_THRESHOLD = 99.0;
     private static final double PRESSURE_THRESHOLD = 100.0;
 
     public void processKafkaStream() {
@@ -51,7 +51,7 @@ public class FlinkDataProcessor {
 
             // Kafka消费者配置
             KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
-                    .setBootstrapServers("localhost:9092")
+                    .setBootstrapServers("192.168.126.1:9092")
                     .setTopics("test-topic")
                     .setGroupId("data-collection-group")
                     .setStartingOffsets(OffsetsInitializer.earliest())

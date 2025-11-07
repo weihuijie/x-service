@@ -1,6 +1,5 @@
 server:
-  port: 8090
-
+  port: 8083
 
 spring:
   data:
@@ -14,6 +13,11 @@ spring:
     username: root
     password: root
 
+
+
+logging:
+  level:
+    com.x.device.access.service: debug
 
 # Dubbo配置
 dubbo:
@@ -31,18 +35,3 @@ dubbo:
     tri-id:
       name: tri
       port: -1
-
-rabbitmq:
-  host: localhost
-  port: 5672
-  username: guest
-  password: guest
-  virtualHost: /
-  alertQueue: sensor.alert.queue
-  connectionTimeout: 5000
-  retryCount: 3 # 重试 3 次
-  retryInterval: 1000 # 每次重试间隔 1 秒（指数退避：1s→2s→3s）
-
-logging:
-  level:
-    com.x.alert.notice.service: debug

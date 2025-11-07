@@ -28,7 +28,7 @@
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-repository-service</artifactId>
-            <version>1.0.0</version>
+            <version>${version}</version>
         </dependency>
 
         <!-- Spring Boot Web依赖 -->
@@ -54,6 +54,7 @@
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
+        <!-- dubbo-->
         <dependency>
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo-registry-nacos</artifactId>

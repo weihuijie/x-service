@@ -8,6 +8,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeoutException;
  * 支持：连接复用、失败重试、资源自动释放、Checkpoint 兼容
  */
 @Slf4j
-public class CustomRabbitMQSink extends RichSinkFunction<SensorData> {
+public class CustomRabbitMQSink extends RichSinkFunction<SensorData> implements Serializable {
     // RabbitMQ 核心对象（每个并行实例一个连接+信道）
     private transient Connection rabbitConnection;
     private transient Channel rabbitChannel;

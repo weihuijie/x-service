@@ -1,20 +1,8 @@
-server:
-  port: 8083
-
 spring:
   application:
     name: x-device-access-service
-    
-  data:
-    redis:
-      port: 6379
-      host: localhost
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/x?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: root
-    password:
+  profiles:
+    active: dev
 
 #mybatis-plus配置
 mybatis-plus:
@@ -33,36 +21,3 @@ mybatis-plus:
     call-setters-on-nulls: false
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    global-config:
-      db-config:
-        #表名下划线命名默认true
-        #        table-underline: true
-        #id类型
-        #        id-type: auto
-        #是否开启大写命名，默认不开启
-        #capital-mode: false
-        #逻辑已删除值,(逻辑删除下有效) 需要注入逻辑策略LogicSqlInjector 以@Bean方式注入
-        logic-not-delete-value: 0
-        #逻辑未删除值,(逻辑删除下有效)
-        logic-delete-value: 1
-
-logging:
-  level:
-    com.x.device.access.service: debug
-
-# Dubbo配置
-dubbo:
-  consumer:
-    check: false # 禁用启动检测
-    lazy: true   # 全局延迟注入，避免时机冲突
-  application:
-    name: ${spring.application.name}
-    logger: slf4j
-    qos-enable: false # 可选，默认true, QOS 服务治理功能
-  registry:
-    address: nacos://nacos:nacos@127.0.0.1:8848
-    register-mode: instance
-  protocols:
-    tri-id:
-      name: tri
-      port: -1
