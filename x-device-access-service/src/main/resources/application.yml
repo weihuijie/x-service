@@ -58,6 +58,7 @@ dubbo:
   application:
     name: ${spring.application.name}
     logger: slf4j
+    qos-enable: false # 可选，默认true, QOS 服务治理功能
   registry:
     address: nacos://nacos:nacos@127.0.0.1:8848
     register-mode: instance

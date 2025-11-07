@@ -3,11 +3,31 @@ server:
 
 spring:
   application:
-    name: data-collection-service
+    name: x-data-collection-service
   kafka:
     bootstrap-servers: localhost:9092
+    # 生产者配置
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # Key 序列化器
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer # Value 序列化器
+      acks: 1 # 消息确认机制（1=leader 接收成功即返回）
+      retries: 3 # 失败重试次数
+      batch-size: 16384 # 批量发送大小（默认 16KB）
+      buffer-memory: 33554432 # 发送缓冲区大小（默认 32MB）
+
+    # 消费者配置
     consumer:
-      group-id: data-collection-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer # Key 反序列化器
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer # Value 反序列化器
+      group-id: data-collection-group # 消费者组 ID（必须指定）
+      auto-offset-reset: earliest # 无历史偏移量时，从最早消息开始消费
+      enable-auto-commit: true # 自动提交偏移量（测试环境推荐）
+      auto-commit-interval: 5000 # 自动提交间隔（500ms）
+
+    # 监听容器配置（消费者监听相关）
+    listener:
+      concurrency: 1 # 消费并发数（与分区数匹配，默认 1）
+      missing-topics-fatal: false # 监听的主题不存在时，应用不启动失败（测试环境推荐关闭）
   iotdb:
     url: 127.0.0.1
     host: 6667
@@ -16,15 +36,9 @@ spring:
     # 增加IoTDB连接池配置
     max-size: 50
 
-# gRPC配置
-grpc:
-  server:
-    port: 9093
-
 logging:
   level:
     com.x.data.collection.service: debug
-
 
 plc-os:
   ip: 192.168.1.1
@@ -44,3 +58,20 @@ xxl:
       port: 9998
       logpath: "D:\\soft\\xxl-job\\log"
       logretentiondays: 30
+
+# Dubbo配置
+dubbo:
+  consumer:
+    check: false # 禁用启动检测
+    lazy: true   # 全局延迟注入，避免时机冲突
+  application:
+    name: ${spring.application.name}
+    logger: slf4j
+    qos-enable: false # 可选，默认true, QOS 服务治理功能
+  registry:
+    address: nacos://nacos:nacos@127.0.0.1:8848
+    register-mode: instance
+  protocols:
+    tri-id:
+      name: tri
+      port: -1

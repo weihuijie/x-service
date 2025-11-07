@@ -47,7 +47,7 @@
         <knife4j.version>4.4.0</knife4j.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <pagehelper.boot.version>1.4.7</pagehelper.boot.version>
-        <fastjson.version>2.0.43</fastjson.version>
+        <fastjson.version>2.0.50</fastjson.version>
         <oshi.version>6.4.13</oshi.version>
         <commons.io.version>2.14.0</commons.io.version>
         <poi.version>5.2.5</poi.version>
@@ -77,12 +77,12 @@
         <dubbo.version>3.3.0</dubbo.version>
 
         <!-- 消息队列版本 -->
-        <kafka.version>3.3.1</kafka.version>
+        <kafka.version>4.1.0</kafka.version>
         <rabbitmq.version>5.18.0</rabbitmq.version>
 
         <!-- 大数据处理版本 -->
         <hadoop.version>3.3.4</hadoop.version>
-        <flink.version>1.16.1</flink.version>
+        <flink.version>1.17.2</flink.version>
 
         <!-- 其他服务版本 -->
         <xxl-job.version>3.2.0</xxl-job.version>
@@ -110,6 +110,12 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.kafka</groupId>
+                        <artifactId>kafka-clients</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Spring Cloud依赖配置 -->
@@ -286,10 +292,49 @@
                 <version>${hadoop.version}</version>
             </dependency>
 
+
+            <!-- Flink 核心依赖 -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-java</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-streaming-java</artifactId>
                 <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-clients</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-base</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <!-- Flink-Kafka 连接器 -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-kafka</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
+            <!-- Flink-JDBC 连接器（读取MySQL规则/写入清洗数据） -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-jdbc</artifactId>
+                <version>3.1.2-1.17</version>
+            </dependency>
+
+            <!-- Flink RabbitMQ Connector -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-rabbitmq</artifactId>
+                <version>3.0.1-1.17</version>
             </dependency>
 
             <!-- 对象存储 -->

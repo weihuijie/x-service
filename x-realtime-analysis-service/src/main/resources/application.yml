@@ -3,18 +3,37 @@ server:
 
 spring:
   application:
-    name: realtime-analysis-service
-    
-kafka:
-  bootstrap-servers: localhost:9092
-  
-flink:
-  job-manager: localhost:8081
-  
-redis:
-  host: localhost
-  port: 6379
+    name: x-realtime-analysis-service
+
+  cloud:
+    # Nacos服务发现配置
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: public
+        group: DEFAULT_GROUP
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
 
 logging:
   level:
     com.x.realtime.analysis.service: debug
+    # Flink 核心包日志级别改为 DEBUG，输出算子处理细节
+    #org.apache.flink.streaming.runtime.tasks: DEBUG
+    #org.apache.flink.streaming.api.operators: DEBUG
+    # 你的包日志级别改为 DEBUG，查看数据处理过程
+    #com.x.realtime.analysis.service.flink: DEBUG
+    org.apache.flink.*: warn
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest
+  virtualHost: /
+  alertQueue: sensor.alert.queue
+  connectionTimeout: 5000
+  retryCount: 3 # 重试 3 次
+  retryInterval: 1000 # 每次重试间隔 1 秒（指数退避：1s→2s→3s）

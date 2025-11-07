@@ -1,12 +1,12 @@
-package com.x.data.collection.service.plc;
+package com.x.data.collection.service.utils.plc;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.x.common.utils.http.HttpEnhancedUtils;
-import com.x.data.collection.service.plc.read.PlcReadReq;
-import com.x.data.collection.service.plc.read.PlcReadRes;
-import com.x.data.collection.service.plc.write.PlcWriteReq;
-import com.x.data.collection.service.plc.write.PlcWriteRes;
+import com.x.data.collection.service.utils.plc.read.PlcReadReq;
+import com.x.data.collection.service.utils.plc.read.PlcReadRes;
+import com.x.data.collection.service.utils.plc.write.PlcWriteReq;
+import com.x.data.collection.service.utils.plc.write.PlcWriteRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.x.device.access.service.service.impl;
+package com.x.device.access.service.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;

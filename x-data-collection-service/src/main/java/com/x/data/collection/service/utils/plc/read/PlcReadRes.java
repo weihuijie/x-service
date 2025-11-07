@@ -1,6 +1,6 @@
-package com.x.data.collection.service.plc.read;
+package com.x.data.collection.service.utils.plc.read;
 
-import com.x.data.collection.service.plc.CuBaseResponse;
+import com.x.data.collection.service.utils.plc.CuBaseResponse;
 import lombok.*;
 
 import java.util.List;

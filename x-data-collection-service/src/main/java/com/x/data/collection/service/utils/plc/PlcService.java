@@ -1,11 +1,11 @@
-package com.x.data.collection.service.plc;
+package com.x.data.collection.service.utils.plc;
 
-import com.x.data.collection.service.plc.read.PlcReadDto;
-import com.x.data.collection.service.plc.read.PlcReadReq;
-import com.x.data.collection.service.plc.read.PlcReadRes;
-import com.x.data.collection.service.plc.write.PlcWriteDto;
-import com.x.data.collection.service.plc.write.PlcWriteReq;
-import com.x.data.collection.service.plc.write.PlcWriteRes;
+import com.x.data.collection.service.utils.plc.read.PlcReadDto;
+import com.x.data.collection.service.utils.plc.read.PlcReadReq;
+import com.x.data.collection.service.utils.plc.read.PlcReadRes;
+import com.x.data.collection.service.utils.plc.write.PlcWriteDto;
+import com.x.data.collection.service.utils.plc.write.PlcWriteReq;
+import com.x.data.collection.service.utils.plc.write.PlcWriteRes;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class PlcService {
                 if ("int".equalsIgnoreCase(valueType)) {
                     dto.setActualValue(random.nextInt(1000));
                 } else if ("float".equalsIgnoreCase(valueType)) {
-                    dto.setActualValue(random.nextFloat() * 100);
+                    dto.setActualValue(random.nextDouble() * 100);
                 } else if ("double".equalsIgnoreCase(valueType)) {
                     dto.setActualValue(random.nextDouble() * 100);
                 } else if ("bool".equalsIgnoreCase(valueType) || "boolean".equalsIgnoreCase(valueType)) {

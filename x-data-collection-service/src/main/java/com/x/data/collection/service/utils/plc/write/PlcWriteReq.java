@@ -1,4 +1,4 @@
-package com.x.data.collection.service.plc.write;
+package com.x.data.collection.service.utils.plc.write;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

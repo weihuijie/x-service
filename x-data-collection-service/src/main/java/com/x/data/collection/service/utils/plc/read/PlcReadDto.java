@@ -1,6 +1,6 @@
-package com.x.data.collection.service.plc.write;
+package com.x.data.collection.service.utils.plc.read;
 
-import com.x.data.collection.service.plc.PlcValueType;
+import com.x.data.collection.service.utils.plc.PlcValueType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,9 +18,9 @@ import java.util.regex.Pattern;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlcWriteDto<T> {
+public class PlcReadDto<T> {
 
-    private static Pattern pattern = Pattern.compile("((DB(\\d+)\\.DBX(\\d+)\\.[0-7])|(DB(\\d+)\\.DBB(\\d+)(\\.0)?)|(DB(\\d+)\\.DBW(\\d+)(\\.0)?)|(DB(\\d+)\\.DBD(\\d+)(\\.0)?)|(I(\\d+)\\.[0-7])|(IW(\\d+)(\\.0)?)|(ID(\\d+)(\\.0)?)|(Q(\\d+)\\.[0-7])|(QW(\\d+)(\\.0)?)|(QD(\\d+)(\\.0)?)|(M(\\d+)\\.[0-7])|(MX(\\d+)\\.[0-7])|(MW(\\d+)(\\.0)?)|(MD(\\d+)(\\.0)?))");
+    private static Pattern pattern = Pattern.compile("((DB(\\d+)\\.DBX(\\d+)\\.[0-7])|(DB(\\d+)\\.DBB(\\d+)(\\.0)?)|(DB(\\d+)\\.DBW(\\d+)(\\.0)?)|(DB(\\d+)\\.DBD(\\d+)(\\.0)?)|(I(\\d+)\\.[0-7])|(IW(\\d+)(\\.0)?)|(ID(\\d+)(\\.0)?)|(Q(\\d+)\\.[0-7])|(QW(\\d+)(\\.0)?)|(QD(\\d+)(\\.0)?)|(M(\\d+)\\.[0-7])|(MW(\\d+)(\\.0)?)|(MD(\\d+)(\\.0)?))");
 
     /**
      * 读取类型
@@ -38,7 +38,7 @@ public class PlcWriteDto<T> {
     private String subAddress;
 
     /**
-     * db块编号
+     * db编号
      */
     private Integer dbNum;
 
@@ -56,15 +56,22 @@ public class PlcWriteDto<T> {
      */
     private Consumer<T> setValue;
 
-    public void setValue(Object value) {
+    public <J> J getActualValue(Class<J> clazz) {
+        if (!clazz.isInstance(value)) {
+            return null;
+        }
+        return clazz.cast(value);
+    }
+
+    public void setActualValue(Object value) {
         if (!clazz.isInstance(value)) {
             return;
         }
         this.value = clazz.cast(value);
     }
 
-    public static <T> PlcWriteDto<T> build(String address, PlcValueType valueType, T value) {
-        var ret = new PlcWriteDto<T>();
+    public static <T> PlcReadDto<T> build(String address, PlcValueType valueType) {
+        var ret = new PlcReadDto<T>();
         if (StringUtils.isBlank(address) || valueType == null) {
             return null;
         }
@@ -88,7 +95,6 @@ public class PlcWriteDto<T> {
         }
         ret.valueType = valueType.getReadType();
         ret.clazz = (Class<T>) valueType.getClazz();
-        ret.value = value;
         return ret;
     }
 

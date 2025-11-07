@@ -1,4 +1,4 @@
-package com.x.data.collection.service.plc;
+package com.x.data.collection.service.utils.plc;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

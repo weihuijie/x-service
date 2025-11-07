@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.x.repository.service.base.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,21 +15,22 @@ import java.io.Serial;
  * 钢板表
  * @author whj
  */
+@Builder
 @Data
-@TableName("device_info")
+@TableName("alert_msg")
 @EqualsAndHashCode(callSuper = true)
-public class DeviceInfoEntity extends BaseEntity {
+public class AlertMsgEntity extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @NotBlank(message = "设备名称不能为空")
-    private String deviceName;
+    @NotBlank(message = "设备id不能为空")
+    private Long deviceId;
 
-    @NotBlank(message = "设备编码不能为空")
-    private String deviceCode;
+    @NotBlank(message = "点位地址不能为空")
+    private String pointAddr;
 
-    private String plcCode;
+    private String pointValue;
 }
