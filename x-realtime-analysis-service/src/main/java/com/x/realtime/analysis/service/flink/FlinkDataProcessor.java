@@ -3,6 +3,7 @@ package com.x.realtime.analysis.service.flink;
 import com.alibaba.fastjson2.JSONArray;
 import com.x.realtime.analysis.service.rabbitmq.CustomRabbitMQSink;
 import com.x.realtime.analysis.service.rabbitmq.RabbitMQConfigProperties;
+import com.x.repository.service.entity.DevicePointInfoEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -53,7 +54,8 @@ public class FlinkDataProcessor {
             KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
                     .setBootstrapServers("192.168.126.1:9092")
                     .setTopics("test-topic")
-                    .setGroupId("data-collection-group")
+                    .setGroupId("data-realtime-group")
+                    .setClientIdPrefix("data-collection-consumer-analysis-")
                     .setStartingOffsets(OffsetsInitializer.earliest())
                     .setValueOnlyDeserializer(new SimpleStringSchema())
                     // 新增：配置 Kafka 消费者参数，解决重平衡问题
@@ -75,32 +77,32 @@ public class FlinkDataProcessor {
             );
 
             // 解析并处理数据（核心修复在这里！）
-            DataStream<SensorData> sensorDataStream = inputStream
-                    // 第一步：解析JSON字符串为List<SensorData>
+            DataStream<DevicePointInfoEntity> sensorDataStream = inputStream
+                    // 第一步：解析JSON字符串为List<DevicePointInfoEntity>
                     .map(new DataParser())
                     .filter(Objects::nonNull) // 过滤解析失败的null List
                     .filter(list -> !list.isEmpty()) // 过滤空List
                     // 第二步：FlatMap拆分+显式声明输出类型（解决类型推断问题！）
                     .flatMap(new ListFlattenFunction())
-                    .returns(SensorData.class) // 关键修复：强制Flink识别输出为SensorData
-                    // 第三步：过滤无效SensorData（修复隐藏bug1：过滤null+pointValue为空）
+                    .returns(DevicePointInfoEntity.class) // 关键修复：强制Flink识别输出为DevicePointInfoEntity
+                    // 第三步：过滤无效DevicePointInfoEntity（修复隐藏bug1：过滤null+pointValue为空）
                     .filter(sensorData -> sensorData != null && sensorData.getPointValue() != null)
-                    // 第四步：只配置一次Watermark（针对SensorData的时间戳）
+                    // 第四步：只配置一次Watermark（针对DevicePointInfoEntity的时间戳）
                     .assignTimestampsAndWatermarks(
-                            WatermarkStrategy.<SensorData>forBoundedOutOfOrderness(Duration.ofSeconds(5))
+                            WatermarkStrategy.<DevicePointInfoEntity>forBoundedOutOfOrderness(Duration.ofSeconds(5))
                                     .withTimestampAssigner((data, recordTimestamp) -> System.currentTimeMillis())
                     );
 
             // 检测温度异常（修复隐藏bug2：判断pointValue非空）
-            DataStream<SensorData> temperatureAlerts = sensorDataStream
+            DataStream<DevicePointInfoEntity> temperatureAlerts = sensorDataStream
                     .filter(new TemperatureAlertFilter());
 
             // 检测压力异常（同理修复）
-            DataStream<SensorData> pressureAlerts = sensorDataStream
+            DataStream<DevicePointInfoEntity> pressureAlerts = sensorDataStream
                     .filter(new PressureAlertFilter());
 
             // 合并所有告警
-            DataStream<SensorData> allAlerts = temperatureAlerts.union(pressureAlerts);
+            DataStream<DevicePointInfoEntity> allAlerts = temperatureAlerts.union(pressureAlerts);
 
             // 发送到RabbitMQ
             allAlerts.addSink(new CustomRabbitMQSink(rabbitMQConfig))
@@ -118,13 +120,13 @@ public class FlinkDataProcessor {
     }
 
     // 数据解析函数（无需修改，保持原样）
-    public static class DataParser implements MapFunction<String, List<SensorData>> {
+    public static class DataParser implements MapFunction<String, List<DevicePointInfoEntity>> {
         @Override
-        public List<SensorData> map(String value) {
+        public List<DevicePointInfoEntity> map(String value) {
             try {
                 log.info("Received sensor data: {}", value);
-                // FastJSON解析JSON数组为List<SensorData>（确保JSON格式正确）
-                return JSONArray.parseArray(value, SensorData.class);
+                // FastJSON解析JSON数组为List<DevicePointInfoEntity>（确保JSON格式正确）
+                return JSONArray.parseArray(value, DevicePointInfoEntity.class);
             } catch (Exception e) {
                 log.error("Failed to parse sensor data: {}", value, e); // 用log记录错误，便于排查
                 return null;
@@ -133,10 +135,10 @@ public class FlinkDataProcessor {
     }
 
     // List拆分函数（无需修改，保持原样）
-    public static class ListFlattenFunction implements FlatMapFunction<List<SensorData>, SensorData> {
+    public static class ListFlattenFunction implements FlatMapFunction<List<DevicePointInfoEntity>, DevicePointInfoEntity> {
         @Override
-        public void flatMap(List<SensorData> sensorDataList, Collector<SensorData> collector) {
-            for (SensorData sensorData : sensorDataList) {
+        public void flatMap(List<DevicePointInfoEntity> sensorDataList, Collector<DevicePointInfoEntity> collector) {
+            for (DevicePointInfoEntity sensorData : sensorDataList) {
                 if (sensorData != null) {
                     collector.collect(sensorData);
                 }
@@ -145,9 +147,9 @@ public class FlinkDataProcessor {
     }
 
     // 温度异常检测（修复空指针：先判断pointValue非空）
-    public static class TemperatureAlertFilter implements FilterFunction<SensorData> {
+    public static class TemperatureAlertFilter implements FilterFunction<DevicePointInfoEntity> {
         @Override
-        public boolean filter(SensorData value) {
+        public boolean filter(DevicePointInfoEntity value) {
             // 先判断pointValue非空，避免空指针
             if (value.getPointValue() == null) {
                 return false;
@@ -164,9 +166,9 @@ public class FlinkDataProcessor {
     }
 
     // 压力异常检测（同理修复）
-    public static class PressureAlertFilter implements FilterFunction<SensorData> {
+    public static class PressureAlertFilter implements FilterFunction<DevicePointInfoEntity> {
         @Override
-        public boolean filter(SensorData value) {
+        public boolean filter(DevicePointInfoEntity value) {
             if (value.getPointValue() == null) {
                 return false;
             }

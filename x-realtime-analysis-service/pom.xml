@@ -16,7 +16,13 @@
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-common</artifactId>
-            <version>1.0.0</version>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.x</groupId>
+            <artifactId>x-repository-service</artifactId>
+            <version>${version}</version>
         </dependency>
         
         <!-- Spring Boot Web依赖 -->

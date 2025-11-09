@@ -122,17 +122,12 @@ public class RabbitMQConsumer {
             // 解析消息为JSON对象
             JSONObject jsonData = JSON.parseObject(message);
             
-            // 提取传感器数据
-            Long deviceId = jsonData.getLong("deviceId");
-            String pointAddr = jsonData.getString("pointAddr");
-            Object pointValue = jsonData.get("pointValue");
-            Integer pointType = jsonData.getInteger("pointType");
-            
             // 构建告警消息
             AlertMsgEntity alertMsgEntity = AlertMsgEntity.builder()
-                    .deviceId(deviceId)
-                    .pointAddr(pointAddr)
-                    .pointValue(pointValue.toString())
+                    .deviceId(jsonData.getLong("deviceId"))
+                    .pointId(jsonData.getLong("id"))
+                    .pointAddr(jsonData.getString("pointAddr"))
+                    .pointValue(jsonData.getString("pointValue"))
                     .build();
             boolean result =  alertMsgDubboService.submit(alertMsgEntity).isSuccess();
             if (!result){

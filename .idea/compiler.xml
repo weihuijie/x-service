@@ -14,7 +14,6 @@
         <module name="x-auth-service" />
         <module name="x-realtime-analysis-service" />
         <module name="x-manage-service" />
-        <module name="x-demo-service" />
         <module name="x-dubbo-api" />
         <module name="x-repository-service" />
         <module name="x-alert-notice-service" />
@@ -26,6 +25,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="x-demo-service" target="17" />
       <module name="x-dubbo-grpc" target="17" />
     </bytecodeTargetLevel>
   </component>

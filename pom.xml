@@ -29,7 +29,6 @@
         <module>x-alert-notice-service</module>
         <module>x-task-scheduler-service</module>
         <module>x-file-service</module>
-        <module>x-demo-service</module>
     </modules>
 
     <properties><!-- 配置，一般为版本管理 -->
@@ -66,7 +65,7 @@
         <!-- 数据库相关版本 -->
         <mysql-connector-j.version>8.1.0</mysql-connector-j.version>
         <mongodb.version>4.8.0</mongodb.version>
-        <iotdb.version>0.13.3</iotdb.version>
+        <iotdb.version>2.0.5</iotdb.version>
         <shardingsphere.version>5.2.1</shardingsphere.version>
 
         <!-- 微服务相关版本 -->
@@ -278,10 +277,10 @@
                 <version>${iotdb.version}</version>
             </dependency>
 
-            <!-- 数据库相关依赖 -->
+            <!-- IoTDB  JDBC 驱动 -->
             <dependency>
                 <groupId>org.apache.iotdb</groupId>
-                <artifactId>service-rpc</artifactId>
+                <artifactId>iotdb-jdbc</artifactId>
                 <version>${iotdb.version}</version>
             </dependency>
 

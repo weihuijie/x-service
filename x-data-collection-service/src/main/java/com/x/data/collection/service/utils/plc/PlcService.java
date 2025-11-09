@@ -52,17 +52,17 @@ public class PlcService {
             Random random = new Random();
             readList.forEach(dto -> {
                 String valueType = dto.getValueType();
-                if ("int".equalsIgnoreCase(valueType)) {
-                    dto.setActualValue(random.nextInt(1000));
-                } else if ("float".equalsIgnoreCase(valueType)) {
-                    dto.setActualValue(random.nextDouble() * 100);
-                } else if ("double".equalsIgnoreCase(valueType)) {
-                    dto.setActualValue(random.nextDouble() * 100);
-                } else if ("bool".equalsIgnoreCase(valueType) || "boolean".equalsIgnoreCase(valueType)) {
+                if ("INT32".equalsIgnoreCase(valueType)) {
+                    dto.setActualValue(random.nextInt(110));
+                } else if ("FLOAT".equalsIgnoreCase(valueType)) {
+                    dto.setActualValue(random.nextDouble() * 110);
+                } else if ("DUBBO".equalsIgnoreCase(valueType)) {
+                    dto.setActualValue(random.nextDouble() * 110);
+                } else if ("BOOL".equalsIgnoreCase(valueType)) {
                     dto.setActualValue(random.nextBoolean());
                 } else {
                     // 默认生成字符串类型数据
-                    dto.setActualValue(random.nextInt(100));
+                    dto.setActualValue(random.nextInt(110));
                 }
             });
             return readList;

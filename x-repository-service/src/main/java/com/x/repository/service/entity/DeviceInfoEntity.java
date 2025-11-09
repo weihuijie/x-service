@@ -11,7 +11,6 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
- * 钢板表
  * @author whj
  */
 @Data

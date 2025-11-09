@@ -2,7 +2,7 @@ package com.x.realtime.analysis.service.rabbitmq;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.rabbitmq.client.*;
-import com.x.realtime.analysis.service.flink.SensorData;
+import com.x.repository.service.entity.DevicePointInfoEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeoutException;
  * 支持：连接复用、失败重试、资源自动释放、Checkpoint 兼容
  */
 @Slf4j
-public class CustomRabbitMQSink extends RichSinkFunction<SensorData> implements Serializable {
+public class CustomRabbitMQSink extends RichSinkFunction<DevicePointInfoEntity> implements Serializable {
     // RabbitMQ 核心对象（每个并行实例一个连接+信道）
     private transient Connection rabbitConnection;
     private transient Channel rabbitChannel;
@@ -63,18 +63,18 @@ public class CustomRabbitMQSink extends RichSinkFunction<SensorData> implements 
      * 处理每条数据：序列化并发送到 RabbitMQ（每条数据执行一次）
      */
     @Override
-    public void invoke(SensorData sensorData, Context context) throws Exception {
+    public void invoke(DevicePointInfoEntity sensorData, Context context) throws Exception {
         if (sensorData == null) {
             log.warn("跳过空数据，不发送到 RabbitMQ");
             return;
         }
 
-        // 1. 序列化 SensorData 为 JSON 字节数组
+        // 1. 序列化 DevicePointInfoEntity 为 JSON 字节数组
         byte[] messageBody;
         try {
             messageBody = JSONObject.toJSONString(sensorData).getBytes();
         } catch (Exception e) {
-            log.error("SensorData 序列化失败，数据：{}", sensorData, e);
+            log.error("DevicePointInfoEntity 序列化失败，数据：{}", sensorData, e);
             return;
         }
 

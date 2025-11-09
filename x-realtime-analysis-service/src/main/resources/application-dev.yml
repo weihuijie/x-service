@@ -1,0 +1,32 @@
+server:
+  port: 8088
+
+spring:
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/x?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  kafka:
+    bootstrap-servers: localhost:9092
+
+
+logging:
+  level:
+    com.x.device.access.service: debug
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest
+  virtualHost: /
+  alertQueue: sensor.alert.queue
+  connectionTimeout: 5000
+  retryCount: 3 # 重试 3 次
+  retryInterval: 1000 # 每次重试间隔 1 秒（指数退避：1s→2s→3s）

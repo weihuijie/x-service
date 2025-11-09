@@ -1,6 +1,9 @@
 package com.x.data.sync.service.utils.kafka;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONException;
+import com.x.data.sync.service.IotDB.DevicePointData;
+import com.x.data.sync.service.IotDB.DeviceDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -12,6 +15,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Kafka 消费者服务（生产级优化：重试、死信、幂等、异常处理、配置解耦）
  */
@@ -19,6 +24,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class KafkaConsumerService implements ConsumerSeekAware {
+
+    private final DeviceDataService deviceDataService;
 
     /**
      * 核心消费方法（优化点：配置解耦、重试、幂等、格式校验、死信转发）
@@ -34,7 +41,7 @@ public class KafkaConsumerService implements ConsumerSeekAware {
     )
     @KafkaListener(
             topics = "${kafka.consumer.topic:test-topic}",
-            groupId = "${kafka.consumer.group-id:data-collection-group}",
+            groupId = "${kafka.consumer.group-id:data-sync-group}",
             // 并发消费：提高吞吐量（配置文件读取，根据分区数调整，建议 ≤ 分区数）
             concurrency = "${kafka.consumer.concurrency:3}",
             // 手动提交 Offset：确保消息处理成功后再提交，避免消息丢失
@@ -43,7 +50,8 @@ public class KafkaConsumerService implements ConsumerSeekAware {
                     "auto.offset.reset=earliest", // 无偏移量时从最新消息开始消费（可配置为 earliest）
                     "session.timeout.ms=10000", // 会话超时时间
                     "heartbeat.interval.ms=3000" // 心跳间隔（建议为会话超时的 1/3）
-            }
+            },
+            clientIdPrefix = "data-collection-consumer-sync-"// 客户端 ID 前缀（可配置为全局唯一）
     )
     public void consumeMessage(
             ConsumerRecord<String, String> record,
@@ -78,8 +86,9 @@ public class KafkaConsumerService implements ConsumerSeekAware {
 
         log.info("【业务处理】主题：{}，分区：{}，偏移量：{}，Key：{}，消息：{}",
                 topic, partition, offset, key, value);
-
-        // 模拟业务处理（如数据库插入、RPC 调用等）
-        // 注意：生产环境需处理业务异常（如数据库连接超时、RPC 调用失败等）
+        List<DevicePointData> devicePointData = JSONArray.parseArray(value, DevicePointData.class);
+        for (DevicePointData deviceDatum : devicePointData) {
+            deviceDataService.writeData(deviceDatum);
+        }
     }
 }

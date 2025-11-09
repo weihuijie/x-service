@@ -8,11 +8,28 @@ spring:
       port: 6379
       host: localhost
 
+  # 多数据源配置（iotdb + mysql）
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/x?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
+    # 1. IOTDB 数据源（时序数据）- 扁平化配置，无 hikari 子节点
+    iotdb:
+      driver-class-name: org.apache.iotdb.jdbc.IoTDBDriver
+      username: root
+      password: root
+      jdbc-url: jdbc:iotdb://localhost:6667/
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      pool-name: IotdbHikariPool
+
+    # 2. MySQL 数据源（业务数据）- 同样扁平化
+    mysql:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: root # 你的 MySQL 用户名
+      password: root # 你的 MySQL 密码
+      jdbc-url: jdbc:mysql://localhost:3306/x?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      pool-name: MysqlHikariPool
+      minimum-idle: 5
 
   kafka:
     bootstrap-servers: localhost:9092
