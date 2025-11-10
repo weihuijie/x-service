@@ -5,7 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * 复用性 RowMapper，适配 IOTDB 2.0.5，通过列别名 metric_val 获取指标值
+ * 复用性 RowMapper，适配 IotDB 2.0.5，通过列别名 metric_val 获取指标值
+ *
+ * @author whj
  */
 public class DeviceDataRowMapper implements RowMapper<DevicePointData> {
     private final Long deviceId;
@@ -23,7 +25,7 @@ public class DeviceDataRowMapper implements RowMapper<DevicePointData> {
         data.setDeviceId(deviceId);
         data.setId(pointId); // 存储原始指标名，符合业务使用习惯
 
-        // 1. 时间戳：IOTDB 2.0.5 时间戳为 LONG 类型，直接获取（避免空值）
+        // 1. 时间戳：IotDB 2.0.5 时间戳为 LONG 类型，直接获取（避免空值）
         long timestamp = rs.getLong("Time");
         data.setTimestamp(timestamp);
 

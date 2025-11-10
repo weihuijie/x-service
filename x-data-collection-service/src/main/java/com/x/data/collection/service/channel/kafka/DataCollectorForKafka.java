@@ -7,6 +7,11 @@
 //import java.util.concurrent.ConcurrentHashMap;
 //import java.util.concurrent.atomic.AtomicLong;
 //
+///**
+// * 数据采集服务 - kafka
+// *
+// *  @author whj
+// */
 //@Component
 //public class DataCollectorForKafka {
 //

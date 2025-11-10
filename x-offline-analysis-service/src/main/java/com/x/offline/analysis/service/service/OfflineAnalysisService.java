@@ -1,7 +1,11 @@
 package com.x.offline.analysis.service.service;
 
 import org.springframework.stereotype.Service;
-
+/**
+ * 离线数据分析服务
+ *
+ * @author whj
+ */
 @Service
 public class OfflineAnalysisService {
     

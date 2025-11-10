@@ -16,6 +16,8 @@ import java.util.UUID;
 
 /**
  * 日志过滤器 - 记录请求和响应信息
+ *
+ * @author whj
  */
 @Component
 public class LoggingFilter implements GlobalFilter, Ordered {

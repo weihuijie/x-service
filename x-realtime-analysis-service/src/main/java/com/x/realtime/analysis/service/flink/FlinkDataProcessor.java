@@ -17,24 +17,30 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
-
+/**
+ * Flink数据处理类
+ *
+ * @author whj
+ */
 @Slf4j
 @Component
 public class FlinkDataProcessor {
 
-    @Autowired
-    private RabbitMQConfigProperties rabbitMQConfig;
+    private final RabbitMQConfigProperties rabbitMQConfig;
 
     // 定义阈值，用于检测异常数据
     private static final double TEMPERATURE_THRESHOLD = 99.0;
     private static final double PRESSURE_THRESHOLD = 100.0;
+
+    public FlinkDataProcessor(RabbitMQConfigProperties rabbitMQConfig) {
+        this.rabbitMQConfig = rabbitMQConfig;
+    }
 
     public void processKafkaStream() {
         try {
@@ -69,35 +75,35 @@ public class FlinkDataProcessor {
                     .setStartingOffsets(OffsetsInitializer.latest())
                     .build();
 
-            // 添加数据源（删除重复的Watermark配置！）
+            // 添加数据源
             DataStream<String> inputStream = env.fromSource(
                     kafkaSource,
                     WatermarkStrategy.noWatermarks(), // 字符串层面无需Watermark，用无水印策略
                     "Kafka Source"
             );
 
-            // 解析并处理数据（核心修复在这里！）
+            // 解析并处理数据
             DataStream<DevicePointInfoEntity> sensorDataStream = inputStream
-                    // 第一步：解析JSON字符串为List<DevicePointInfoEntity>
+                    // 解析JSON字符串为List<DevicePointInfoEntity>
                     .map(new DataParser())
                     .filter(Objects::nonNull) // 过滤解析失败的null List
                     .filter(list -> !list.isEmpty()) // 过滤空List
-                    // 第二步：FlatMap拆分+显式声明输出类型（解决类型推断问题！）
+                    // FlatMap拆分+显式声明输出类型（解决类型推断问题！）
                     .flatMap(new ListFlattenFunction())
-                    .returns(DevicePointInfoEntity.class) // 关键修复：强制Flink识别输出为DevicePointInfoEntity
-                    // 第三步：过滤无效DevicePointInfoEntity（修复隐藏bug1：过滤null+pointValue为空）
+                    .returns(DevicePointInfoEntity.class) // 强制Flink识别输出为DevicePointInfoEntity
+                    // 过滤无效DevicePointInfoEntity（修复隐藏bug1：过滤null+pointValue为空）
                     .filter(sensorData -> sensorData != null && sensorData.getPointValue() != null)
-                    // 第四步：只配置一次Watermark（针对DevicePointInfoEntity的时间戳）
+                    // 只配置一次Watermark（针对DevicePointInfoEntity的时间戳）
                     .assignTimestampsAndWatermarks(
                             WatermarkStrategy.<DevicePointInfoEntity>forBoundedOutOfOrderness(Duration.ofSeconds(5))
                                     .withTimestampAssigner((data, recordTimestamp) -> System.currentTimeMillis())
                     );
 
-            // 检测温度异常（修复隐藏bug2：判断pointValue非空）
+            // 检测温度异常
             DataStream<DevicePointInfoEntity> temperatureAlerts = sensorDataStream
                     .filter(new TemperatureAlertFilter());
 
-            // 检测压力异常（同理修复）
+            // 检测压力异常
             DataStream<DevicePointInfoEntity> pressureAlerts = sensorDataStream
                     .filter(new PressureAlertFilter());
 
@@ -119,7 +125,7 @@ public class FlinkDataProcessor {
         }
     }
 
-    // 数据解析函数（无需修改，保持原样）
+    // 数据解析函数
     public static class DataParser implements MapFunction<String, List<DevicePointInfoEntity>> {
         @Override
         public List<DevicePointInfoEntity> map(String value) {
@@ -134,7 +140,7 @@ public class FlinkDataProcessor {
         }
     }
 
-    // List拆分函数（无需修改，保持原样）
+    // List拆分函数
     public static class ListFlattenFunction implements FlatMapFunction<List<DevicePointInfoEntity>, DevicePointInfoEntity> {
         @Override
         public void flatMap(List<DevicePointInfoEntity> sensorDataList, Collector<DevicePointInfoEntity> collector) {
@@ -146,7 +152,7 @@ public class FlinkDataProcessor {
         }
     }
 
-    // 温度异常检测（修复空指针：先判断pointValue非空）
+    // 温度异常检测
     public static class TemperatureAlertFilter implements FilterFunction<DevicePointInfoEntity> {
         @Override
         public boolean filter(DevicePointInfoEntity value) {
@@ -154,7 +160,7 @@ public class FlinkDataProcessor {
             if (value.getPointValue() == null) {
                 return false;
             }
-            // 安全转换数值（处理不同类型的pointValue：int/double/bool）
+            // 安全转换数值
             try {
                 double valueDouble = new BigDecimal(value.getPointValue().toString()).doubleValue();
                 return valueDouble > TEMPERATURE_THRESHOLD;
@@ -165,7 +171,7 @@ public class FlinkDataProcessor {
         }
     }
 
-    // 压力异常检测（同理修复）
+    // 压力异常检测
     public static class PressureAlertFilter implements FilterFunction<DevicePointInfoEntity> {
         @Override
         public boolean filter(DevicePointInfoEntity value) {

@@ -3,6 +3,7 @@ package com.x.common.constant;
 /**
  * 返回状态码
  *
+ * @author whj
  */
 public class HttpStatus
 {

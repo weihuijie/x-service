@@ -4,6 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * RestTemplate配置类
+ *
+ * @author whj
+ */
 @Configuration
 public class RestTemplateConfig {
     

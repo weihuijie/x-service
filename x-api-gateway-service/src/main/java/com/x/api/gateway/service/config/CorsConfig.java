@@ -10,6 +10,8 @@ import java.util.Collections;
 
 /**
  * 跨域配置类 - 统一处理所有服务的跨域请求
+ *
+ * @author whj
  */
 @Configuration
 public class CorsConfig {

@@ -7,14 +7,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 /**
  * API网关服务入口类
  * 集成Spring Cloud Gateway实现统一的API接入、路由转发、认证授权、限流熔断等功能
+ * 
+ * @author whj
  */
 @SpringBootApplication
 @EnableDiscoveryClient  // 启用服务发现
 public class ApiGatewayServiceApplication {
-    
-    /**
-     * 主入口方法
-     */
     public static void main(String[] args) {
         SpringApplication.run(ApiGatewayServiceApplication.class, args);
     }

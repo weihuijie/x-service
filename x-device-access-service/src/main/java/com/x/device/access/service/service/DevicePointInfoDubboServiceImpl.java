@@ -18,6 +18,7 @@ import java.util.List;
 /**
  *  服务实现类
  *
+ * @author whj
  */
 @Slf4j
 @RestController
@@ -68,7 +69,7 @@ public class DevicePointInfoDubboServiceImpl implements IDevicePointInfoDubboSer
      * 新增或修改
      */
     @PostMapping("/submit")
-    public R submit(@Valid @RequestBody DevicePointInfoEntity device) {
+    public R<Object> submit(@Valid @RequestBody DevicePointInfoEntity device) {
         boolean updateResult = devicePointInfoService.saveOrUpdate(device) ;
         return R.status(updateResult);
     }
@@ -77,7 +78,7 @@ public class DevicePointInfoDubboServiceImpl implements IDevicePointInfoDubboSer
      * 逻辑删除
      */
     @GetMapping("/remove")
-    public R remove(@RequestParam(name = "id") Long id) {
+    public R<Object> remove(@RequestParam(name = "id") Long id) {
         boolean updateResult = devicePointInfoService.removeById(id) ;
         return R.status(updateResult);
     }

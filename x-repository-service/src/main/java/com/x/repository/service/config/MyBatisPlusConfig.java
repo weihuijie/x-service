@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * MyBatisPlus配置类
+ *
+ * @author whj
  */
 @Configuration
 public class MyBatisPlusConfig {

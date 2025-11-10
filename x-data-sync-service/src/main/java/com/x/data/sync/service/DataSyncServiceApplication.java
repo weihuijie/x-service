@@ -19,10 +19,10 @@ public class DataSyncServiceApplication implements CommandLineRunner {
         SpringApplication.run(DataSyncServiceApplication.class, args);
     }
 
-    // 应用启动时初始化 IOTDB 存储组
+    // 应用启动时初始化 IotDB 存储组
     @Override
     public void run(String... args) {
         deviceDataService.initStorageGroup();
-        System.out.println("IOTDB 存储组初始化完成！");
+        System.out.println("IotDB 存储组初始化完成！");
     }
 }

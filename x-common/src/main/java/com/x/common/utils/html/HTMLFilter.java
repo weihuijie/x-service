@@ -1,5 +1,7 @@
 package com.x.common.utils.html;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,21 +15,18 @@ import java.util.regex.Pattern;
 /**
  * HTML过滤器，用于去除XSS漏洞隐患。
  *
+ * @author whj
  */
 public final class HTMLFilter
 {
-    /**
-     * regex flag union representing /si modifiers in php
-     **/
-    private static final int REGEX_FLAGS_SI = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
     private static final Pattern P_COMMENTS = Pattern.compile("<!--(.*?)-->", Pattern.DOTALL);
-    private static final Pattern P_COMMENT = Pattern.compile("^!--(.*)--$", REGEX_FLAGS_SI);
+    private static final Pattern P_COMMENT = Pattern.compile("^!--(.*)--$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern P_TAGS = Pattern.compile("<(.*?)>", Pattern.DOTALL);
-    private static final Pattern P_END_TAG = Pattern.compile("^/([a-z0-9]+)", REGEX_FLAGS_SI);
-    private static final Pattern P_START_TAG = Pattern.compile("^([a-z0-9]+)(.*?)(/?)$", REGEX_FLAGS_SI);
-    private static final Pattern P_QUOTED_ATTRIBUTES = Pattern.compile("([a-z0-9]+)=([\"'])(.*?)\\2", REGEX_FLAGS_SI);
-    private static final Pattern P_UNQUOTED_ATTRIBUTES = Pattern.compile("([a-z0-9]+)(=)([^\"\\s']+)", REGEX_FLAGS_SI);
-    private static final Pattern P_PROTOCOL = Pattern.compile("^([^:]+):", REGEX_FLAGS_SI);
+    private static final Pattern P_END_TAG = Pattern.compile("^/([a-z0-9]+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern P_START_TAG = Pattern.compile("^([a-z0-9]+)(.*?)(/?)$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern P_QUOTED_ATTRIBUTES = Pattern.compile("([a-z0-9]+)=([\"'])(.*?)\\2", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern P_UNQUOTED_ATTRIBUTES = Pattern.compile("([a-z0-9]+)(=)([^\"\\s']+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern P_PROTOCOL = Pattern.compile("^([^:]+):", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern P_ENTITY = Pattern.compile("&#(\\d+);?");
     private static final Pattern P_ENTITY_UNICODE = Pattern.compile("&#x([0-9a-f]+);?");
     private static final Pattern P_ENCODE = Pattern.compile("%([0-9a-f]{2});?");
@@ -44,60 +43,60 @@ public final class HTMLFilter
     private static final Pattern P_RIGHT_ARROW = Pattern.compile(">");
     private static final Pattern P_BOTH_ARROWS = Pattern.compile("<>");
 
-    // @xxx could grow large... maybe use sesat's ReferenceMap
     private static final ConcurrentMap<String, Pattern> P_REMOVE_PAIR_BLANKS = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Pattern> P_REMOVE_SELF_BLANKS = new ConcurrentHashMap<>();
 
     /**
-     * set of allowed html elements, along with allowed attributes for each element
+     * 允许的html元素集合，以及每个元素允许的属性
      **/
     private final Map<String, List<String>> vAllowed;
     /**
-     * counts of open tags for each (allowable) html element
+     * 每个（允许的）html元素的开放标签计数
      **/
     private final Map<String, Integer> vTagCounts = new HashMap<>();
 
     /**
-     * html elements which must always be self-closing (e.g. "<img />")
+     * 必须始终自闭合的html元素（例如"<img />"）
      **/
     private final String[] vSelfClosingTags;
     /**
-     * html elements which must always have separate opening and closing tags (e.g. "<b></b>")
+     * 必须始终具有独立开启和关闭标签的html元素（例如"<b></b>"）
      **/
     private final String[] vNeedClosingTags;
     /**
-     * set of disallowed html elements
+     * 不允许的html元素集合
      **/
     private final String[] vDisallowed;
     /**
-     * attributes which should be checked for valid protocols
+     * 应检查有效协议的属性
      **/
     private final String[] vProtocolAtts;
     /**
-     * allowed protocols
+     * 允许的协议
      **/
     private final String[] vAllowedProtocols;
     /**
-     * tags which should be removed if they contain no content (e.g. "<b></b>" or "<b />")
+     * 如果不包含内容应该被移除的标签（例如"<b></b>"或"<b />"）
      **/
     private final String[] vRemoveBlanks;
     /**
-     * entities allowed within html markup
+     * html标记中允许的实体
      **/
     private final String[] vAllowedEntities;
     /**
-     * flag determining whether comments are allowed in input String.
+     * 标志，确定输入字符串中是否允许注释。
      */
     private final boolean stripComment;
     private final boolean encodeQuotes;
     /**
-     * flag determining whether to try to make tags when presented with "unbalanced" angle brackets (e.g. "<b text </b>"
-     * becomes "<b> text </b>"). If set to false, unbalanced angle brackets will be html escaped.
+     * 标志，确定当出现"不平衡"的尖括号时是否尝试制作标签（例如"<b text </b>"
+     * 变成"<b> text </b>"）。如果设置为false，不平衡的尖括号将被html转义。
      */
+    @Getter
     private final boolean alwaysMakeTags;
 
     /**
-     * Default constructor.
+     * 默认构造函数。
      */
     public HTMLFilter()
     {
@@ -134,8 +133,8 @@ public final class HTMLFilter
     }
 
     /**
-     * Map-parameter configurable constructor.
-    *     * @param conf map containing configuration. keys match field names.
+     * 可通过Map参数配置的构造函数。
+     * @param conf 包含配置的map。键与字段名匹配。
      */
     @SuppressWarnings("unchecked")
     public HTMLFilter(final Map<String, Object> conf)
@@ -188,9 +187,9 @@ public final class HTMLFilter
     // ---------------------------------------------------------------
 
     /**
-     * given a user submitted input String, filter out any invalid or restricted html.
-    *     * @param input text (i.e. submitted by a user) than may contain html
-     * @return "clean" version of input, with only valid, whitelisted html elements allowed
+     * 给定用户提交的输入字符串，过滤掉任何无效或受限制的html。
+     * @param input 可能包含html的文本（即由用户提交）
+     * @return 输入的"干净"版本，只允许有效的、白名单中的html元素
      */
     public String filter(final String input)
     {
@@ -210,11 +209,6 @@ public final class HTMLFilter
         return s;
     }
 
-    public boolean isAlwaysMakeTags()
-    {
-        return alwaysMakeTags;
-    }
-
     public boolean isStripComments()
     {
         return stripComment;
@@ -223,7 +217,7 @@ public final class HTMLFilter
     private String escapeComments(final String s)
     {
         final Matcher m = P_COMMENTS.matcher(s);
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
         if (m.find())
         {
             final String match = m.group(1); // (.*?)
@@ -270,7 +264,7 @@ public final class HTMLFilter
     {
         Matcher m = P_TAGS.matcher(s);
 
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
         while (m.find())
         {
             String replaceStr = m.group(1);
@@ -374,10 +368,6 @@ public final class HTMLFilter
                     paramName = paramNames.get(ii).toLowerCase();
                     paramValue = paramValues.get(ii);
 
-                    // debug( "paramName='" + paramName + "'" );
-                    // debug( "paramValue='" + paramValue + "'" );
-                    // debug( "allowed? " + vAllowed.get( name ).contains( paramName ) );
-
                     if (allowedAttribute(name, paramName))
                     {
                         if (inArray(paramName, vProtocolAtts))
@@ -398,7 +388,7 @@ public final class HTMLFilter
                     ending = "";
                 }
 
-                if (ending == null || ending.length() < 1)
+                if (ending == null || ending.isEmpty())
                 {
                     if (vTagCounts.containsKey(name))
                     {
@@ -454,35 +444,35 @@ public final class HTMLFilter
 
     private String decodeEntities(String s)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         Matcher m = P_ENTITY.matcher(s);
         while (m.find())
         {
             final String match = m.group(1);
-            final int decimal = Integer.decode(match).intValue();
+            final int decimal = Integer.decode(match);
             m.appendReplacement(buf, Matcher.quoteReplacement(chr(decimal)));
         }
         m.appendTail(buf);
         s = buf.toString();
 
-        buf = new StringBuffer();
+        buf = new StringBuilder();
         m = P_ENTITY_UNICODE.matcher(s);
         while (m.find())
         {
             final String match = m.group(1);
-            final int decimal = Integer.valueOf(match, 16).intValue();
+            final int decimal = Integer.valueOf(match, 16);
             m.appendReplacement(buf, Matcher.quoteReplacement(chr(decimal)));
         }
         m.appendTail(buf);
         s = buf.toString();
 
-        buf = new StringBuffer();
+        buf = new StringBuilder();
         m = P_ENCODE.matcher(s);
         while (m.find())
         {
             final String match = m.group(1);
-            final int decimal = Integer.valueOf(match, 16).intValue();
+            final int decimal = Integer.valueOf(match, 16);
             m.appendReplacement(buf, Matcher.quoteReplacement(chr(decimal)));
         }
         m.appendTail(buf);
@@ -494,9 +484,8 @@ public final class HTMLFilter
 
     private String validateEntities(final String s)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
-        // validate entities throughout the string
         Matcher m = P_VALID_ENTITIES.matcher(s);
         while (m.find())
         {
@@ -513,7 +502,7 @@ public final class HTMLFilter
     {
         if (encodeQuotes)
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             Matcher m = P_VALID_QUOTES.matcher(s);
             while (m.find())
             {

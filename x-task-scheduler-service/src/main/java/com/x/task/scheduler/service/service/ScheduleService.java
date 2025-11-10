@@ -1,7 +1,11 @@
 package com.x.task.scheduler.service.service;
 
 import org.springframework.stereotype.Service;
-
+/**
+ * 定时任务服务类
+ *
+ * @author whj
+ */
 @Service
 public class ScheduleService {
     

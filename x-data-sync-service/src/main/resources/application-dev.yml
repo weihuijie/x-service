@@ -10,7 +10,7 @@ spring:
 
   # 多数据源配置（iotdb + mysql）
   datasource:
-    # 1. IOTDB 数据源（时序数据）- 扁平化配置，无 hikari 子节点
+    # 1. IotDB 数据源（时序数据）- 扁平化配置，无 hikari 子节点
     iotdb:
       driver-class-name: org.apache.iotdb.jdbc.IoTDBDriver
       username: root

@@ -17,6 +17,8 @@ import java.util.Map;
 
 /**
  * 参数校验过滤器 - 统一校验请求参数，防止恶意请求
+ *
+ * @author whj
  */
 @Component
 public class ParameterValidationFilter implements GlobalFilter, Ordered {

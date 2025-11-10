@@ -12,6 +12,8 @@ import java.util.Map;
 
 /**
  * Spring 全局异常处理器
+ *
+ * @author whj
  */
 @Slf4j
 @ControllerAdvice

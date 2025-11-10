@@ -1,14 +1,21 @@
 package com.x.realtime.analysis.service.service;
 
+import com.esotericsoftware.minlog.Log;
 import com.x.realtime.analysis.service.flink.FlinkDataProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+/**
+ * 实时数据处理服务
+ *
+ * @author whj
+ */
 @Service
 public class RealTimeAnalysisService {
 
-    @Autowired
-    private FlinkDataProcessor flinkDataProcessor;
+    private final FlinkDataProcessor flinkDataProcessor;
+
+    public RealTimeAnalysisService(FlinkDataProcessor flinkDataProcessor) {
+        this.flinkDataProcessor = flinkDataProcessor;
+    }
 
     /**
      * 分析数据流
@@ -22,8 +29,7 @@ public class RealTimeAnalysisService {
             try {
                 flinkDataProcessor.processKafkaStream();
             } catch (Exception e) {
-                System.err.println("Flink processing error: " + e.getMessage());
-                e.printStackTrace();
+                Log.error("Flink processing error: ",e);
             }
         }).start();
     }

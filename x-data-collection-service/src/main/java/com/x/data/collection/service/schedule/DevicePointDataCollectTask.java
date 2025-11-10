@@ -4,7 +4,11 @@ import com.x.data.collection.service.collector.DevicePointDataCollectService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
+/**
+ * 设备点位数据采集任务
+ *
+ * @author whj
+ */
 @Slf4j
 @Component
 public class DevicePointDataCollectTask {
@@ -16,7 +20,7 @@ public class DevicePointDataCollectTask {
     }
 
     @XxlJob("DevicePointDataCollect")
-    public void collect() throws Exception {
+    public void collect() {
         devicePointDataCollectService.devicePointDataCollect();
     }
 }

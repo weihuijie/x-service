@@ -1,7 +1,5 @@
 package com.x.api.gateway.service.filter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -13,12 +11,12 @@ import java.util.UUID;
 
 /**
  * 请求追踪过滤器 - 为每个请求生成唯一的追踪ID，便于日志追踪和问题排查
+ *
+ * @author whj
  */
 @Component
 public class TraceFilter implements GlobalFilter, Ordered {
 
-    private static final Logger logger = LoggerFactory.getLogger(TraceFilter.class);
-    
     public static final String TRACE_ID = "traceId";
 
     @Override

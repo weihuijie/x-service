@@ -81,7 +81,7 @@
             <artifactId>hadoop-client</artifactId>
         </dependency>
 
-        <!-- Spring JDBC + IOTDB JDBC 客户端 -->
+        <!-- Spring JDBC + IotDB JDBC 客户端 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>

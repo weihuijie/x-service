@@ -29,6 +29,10 @@ spring:
           uri: lb://x-device-access-service
           predicates:
             - Path=/device/**
+        - id: x-data-sync-service
+          uri: lb://x-data-sync-service
+          predicates:
+            - Path=/device-data/**
         - id: x-auth-service
           uri: lb://x-auth-service
           predicates:

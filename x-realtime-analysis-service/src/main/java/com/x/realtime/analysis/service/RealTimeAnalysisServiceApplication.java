@@ -1,21 +1,22 @@
 package com.x.realtime.analysis.service;
 
 import com.x.realtime.analysis.service.service.RealTimeAnalysisService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.annotation.PostConstruct;
 
 @SpringBootApplication
 public class RealTimeAnalysisServiceApplication {
 
-    @Autowired
-    private RealTimeAnalysisService realTimeAnalysisService;
+    private final RealTimeAnalysisService realTimeAnalysisService;
+
+    public RealTimeAnalysisServiceApplication(RealTimeAnalysisService realTimeAnalysisService) {
+        this.realTimeAnalysisService = realTimeAnalysisService;
+    }
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(RealTimeAnalysisServiceApplication.class, args);
+        SpringApplication.run(RealTimeAnalysisServiceApplication.class, args);
     }
 
     @PostConstruct

@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * IOTDB 数据读写
+ * IotDB 数据读写
+ *
+ * @author whj
  */
 @RestController
 @RequestMapping("/api/device-data")
@@ -16,7 +18,7 @@ public class DeviceDataController {
     private final DeviceDataService deviceDataService;
 
     @PostMapping
-    public R write(@RequestBody DevicePointData data) {
+    public R<Object> write(@RequestBody DevicePointData data) {
         deviceDataService.writeData(data);
         return R.success("写入成功"); // Spring Boot Plus 统一响应
     }
@@ -26,7 +28,13 @@ public class DeviceDataController {
             @RequestParam("deviceId") Long deviceId,
             @RequestParam("pointId") Long pointId
     ) {
-        return R.data(deviceDataService.queryLatest(deviceId, pointId));
+        DevicePointData devicePointData;
+        try {
+            devicePointData = deviceDataService.queryLatest(deviceId, pointId);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.data(devicePointData);
     }
 
     @GetMapping("/history")
@@ -36,6 +44,12 @@ public class DeviceDataController {
             @RequestParam("startTime") String startTime,
             @RequestParam("endTime") String endTime
     ) {
-        return R.data(deviceDataService.queryHistory(deviceId, pointId, startTime, endTime));
+        List<DevicePointData> devicePointDatas;
+        try {
+            devicePointDatas = deviceDataService.queryHistory(deviceId, pointId, startTime, endTime);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.data(devicePointDatas);
     }
 }

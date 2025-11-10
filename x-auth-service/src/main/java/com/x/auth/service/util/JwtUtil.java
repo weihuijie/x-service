@@ -10,12 +10,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * JWT工具类
+ * 用于生成和验证JWT Token
+ *
+ * @author whj
+ */
 @Component
 public class JwtUtil {
-    
-    private String secret = "x_service_secret_key_which_should_be_at_least_256_bits_long_for_HS256_algorithm";
-    
-    private Long expiration = 3600000L;
+
+    private final String SECRET = "x_service_secret_key_which_should_be_at_least_256_bits_long_for_HS256_algorithm";
+
+    private final Long EXPIRATION = 3600000L;
     
     public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
@@ -28,8 +34,8 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
     }
     
@@ -56,7 +62,7 @@ public class JwtUtil {
     }
     
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
     }
     
     private Boolean isTokenExpired(String token) {

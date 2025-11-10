@@ -12,8 +12,9 @@ import java.io.Serializable;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 基于 Rabbit MQ 官方客户端的自定义 Flink Sink
- * 支持：连接复用、失败重试、资源自动释放、Checkpoint 兼容
+ * 基于 Rabbit MQ 的自定义 Flink Sink
+ *
+ * @author whj
  */
 @Slf4j
 public class CustomRabbitMQSink extends RichSinkFunction<DevicePointInfoEntity> implements Serializable {
@@ -69,7 +70,7 @@ public class CustomRabbitMQSink extends RichSinkFunction<DevicePointInfoEntity> 
             return;
         }
 
-        // 1. 序列化 DevicePointInfoEntity 为 JSON 字节数组
+        // 序列化为 JSON 字节数组
         byte[] messageBody;
         try {
             messageBody = JSONObject.toJSONString(sensorData).getBytes();
@@ -78,7 +79,7 @@ public class CustomRabbitMQSink extends RichSinkFunction<DevicePointInfoEntity> 
             return;
         }
 
-        // 2. 发送消息（支持重试）
+        // 发送消息（支持重试）
         sendWithRetry(alertQueue, messageBody);
     }
 
@@ -111,7 +112,7 @@ public class CustomRabbitMQSink extends RichSinkFunction<DevicePointInfoEntity> 
      * 创建 RabbitMQ 连接和信道（封装连接逻辑，支持重连）
      */
     private void createRabbitConnectionAndChannel() throws IOException, TimeoutException {
-        // 1. 构建 RabbitMQ 连接工厂
+        // 构建 RabbitMQ 连接工厂
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(host);
         factory.setPort(port);
@@ -120,11 +121,11 @@ public class CustomRabbitMQSink extends RichSinkFunction<DevicePointInfoEntity> 
         factory.setVirtualHost(virtualHost);
         factory.setConnectionTimeout(connectionTimeout);
 
-        // 2. 创建连接和信道
+        // 创建连接和信道
         rabbitConnection = factory.newConnection("Flink-Custom-RabbitMQ-Sink");
         rabbitChannel = rabbitConnection.createChannel();
 
-        // 3. 声明队列（确保队列存在，不存在则自动创建）
+        // 声明队列（确保队列存在，不存在则自动创建）
         // durable=true：队列持久化（重启 RabbitMQ 后队列不丢失）
         // exclusive=false：允许其他连接访问队列
         // autoDelete=false：不自动删除队列（无消费者时不删除）
@@ -152,8 +153,6 @@ public class CustomRabbitMQSink extends RichSinkFunction<DevicePointInfoEntity> 
 
     /**
      * 发送消息（带重试机制）
-     * @param queueName 队列名
-     * @param messageBody 消息体（字节数组）
      */
     private void sendWithRetry(String queueName, byte[] messageBody) throws Exception {
         int retryCount = 0;

@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
+ * 设备表
  * @author whj
  */
 @Data

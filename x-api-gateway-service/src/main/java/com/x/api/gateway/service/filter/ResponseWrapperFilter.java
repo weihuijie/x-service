@@ -2,8 +2,7 @@ package com.x.api.gateway.service.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -11,6 +10,7 @@ import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -21,12 +21,13 @@ import java.util.Map;
 
 /**
  * 统一响应格式过滤器 - 将所有响应包装为统一的JSON格式
+ *
+ * @author whj
  */
+@Slf4j
 @Component
 public class ResponseWrapperFilter implements GlobalFilter, Ordered {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResponseWrapperFilter.class);
-    
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -40,22 +41,26 @@ public class ResponseWrapperFilter implements GlobalFilter, Ordered {
 
         ServerHttpResponseDecorator responseDecorator = new ServerHttpResponseDecorator(exchange.getResponse()) {
             @Override
-            public Mono<Void> writeWith(org.reactivestreams.Publisher<? extends DataBuffer> body) {
+            public Mono<Void> writeWith(@Nullable org.reactivestreams.Publisher<? extends DataBuffer> body) {
                 if (body instanceof reactor.core.publisher.Flux) {
+                    //noinspection unchecked
                     return super.writeWith(((reactor.core.publisher.Flux<DataBuffer>) body).map(dataBuffer -> {
                         byte[] content = new byte[dataBuffer.readableByteCount()];
                         dataBuffer.read(content);
                         String responseBody = new String(content, StandardCharsets.UTF_8);
-                        
+
                         // 包装响应体
                         String wrappedResponse = wrapResponseBody(responseBody, (HttpStatus) this.getDelegate().getStatusCode());
-                        
+
                         // 创建新的数据缓冲区
                         DataBufferFactory bufferFactory = exchange.getResponse().bufferFactory();
                         return bufferFactory.wrap(wrappedResponse.getBytes(StandardCharsets.UTF_8));
                     }));
                 }
-                return super.writeWith(body);
+                if (body != null) {
+                    return super.writeWith(body);
+                }
+                return Mono.empty();
             }
         };
 
@@ -87,7 +92,7 @@ public class ResponseWrapperFilter implements GlobalFilter, Ordered {
             responseWrapper.put("timestamp", System.currentTimeMillis());
             return objectMapper.writeValueAsString(responseWrapper);
         } catch (Exception e) {
-            logger.error("Error wrapping response body: {}", e.getMessage(), e);
+            log.error("Error wrapping response body: {}", e.getMessage(), e);
             return originalBody; // 出错时返回原始响应
         }
     }

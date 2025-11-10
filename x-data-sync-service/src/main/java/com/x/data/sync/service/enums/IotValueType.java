@@ -4,7 +4,11 @@ package com.x.data.sync.service.enums;
 import com.x.common.enums.BaseEnum;
 import lombok.Getter;
 
-
+/**
+ * IotDB数据类型枚举
+ *
+ * @author whj
+ */
 @Getter
 public enum IotValueType implements BaseEnum {
     BOOL(1, "BOOLEAN"),

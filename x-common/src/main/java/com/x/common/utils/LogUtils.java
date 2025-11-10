@@ -3,6 +3,7 @@ package com.x.common.utils;
 /**
  * 处理并记录日志文件
  *
+ *  @author whj
  */
 public class LogUtils
 {

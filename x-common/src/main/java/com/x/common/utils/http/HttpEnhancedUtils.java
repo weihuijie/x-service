@@ -86,6 +86,7 @@ public class HttpEnhancedUtils {
             return !(ex instanceof InterruptedException) && !(ex.getCause() instanceof InterruptedException);
         };
         // 响应处理器（默认字符串）
+        @SuppressWarnings("unchecked")
         private HttpResponse.BodyHandler<T> responseHandler = (HttpResponse.BodyHandler<T>) HttpResponse.BodyHandlers.ofString();
 
         private RequestBuilder(String url, String method) {

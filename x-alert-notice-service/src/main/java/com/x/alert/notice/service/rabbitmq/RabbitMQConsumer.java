@@ -1,12 +1,11 @@
 package com.x.alert.notice.service.rabbitmq;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.rabbitmq.client.*;
 import com.x.alert.notice.service.service.AlertMsgDubboServiceImpl;
 import com.x.repository.service.entity.AlertMsgEntity;
+import com.x.repository.service.entity.DevicePointInfoEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -17,20 +16,25 @@ import java.util.concurrent.TimeoutException;
 /**
  * RabbitMQ消息消费者客户端
  * 用于从RabbitMQ队列中消费传感器告警消息
+ *
+ * @author whj
  */
 @Slf4j
 @Component
 public class RabbitMQConsumer {
     
-    @Autowired
-    private RabbitMQConfigProperties rabbitMQConfig;
+    private final RabbitMQConfigProperties rabbitMQConfig;
 
-    @Autowired
-    private AlertMsgDubboServiceImpl alertMsgDubboService;
+    private final AlertMsgDubboServiceImpl alertMsgDubboService;
     
     private Connection connection;
     private Channel channel;
-    
+
+    public RabbitMQConsumer(RabbitMQConfigProperties rabbitMQConfig, AlertMsgDubboServiceImpl alertMsgDubboService) {
+        this.rabbitMQConfig = rabbitMQConfig;
+        this.alertMsgDubboService = alertMsgDubboService;
+    }
+
     /**
      * 初始化RabbitMQ连接和消费者
      */
@@ -61,7 +65,7 @@ public class RabbitMQConsumer {
         connection = factory.newConnection("Alert-Notice-Service-Consumer");
         channel = connection.createChannel();
         
-        // 声明队列（确保队列存在）
+        // 声明队列
         channel.queueDeclare(
                 rabbitMQConfig.getAlertQueue(),
                 true,  // durable
@@ -99,9 +103,7 @@ public class RabbitMQConsumer {
         };
         
         // 取消消费回调
-        CancelCallback cancelCallback = consumerTag -> {
-            log.warn("消费者被取消: {}", consumerTag);
-        };
+        CancelCallback cancelCallback = consumerTag -> log.warn("消费者被取消: {}", consumerTag);
         
         // 开始消费消息
         channel.basicConsume(
@@ -120,14 +122,15 @@ public class RabbitMQConsumer {
     private void processMessage(String message) {
         try {
             // 解析消息为JSON对象
-            JSONObject jsonData = JSON.parseObject(message);
+            DevicePointInfoEntity devicePointInfoEntity = JSON.parseObject(message, DevicePointInfoEntity.class);
             
             // 构建告警消息
             AlertMsgEntity alertMsgEntity = AlertMsgEntity.builder()
-                    .deviceId(jsonData.getLong("deviceId"))
-                    .pointId(jsonData.getLong("id"))
-                    .pointAddr(jsonData.getString("pointAddr"))
-                    .pointValue(jsonData.getString("pointValue"))
+                    .deviceId(devicePointInfoEntity.getDeviceId())
+                    .pointId(devicePointInfoEntity.getId())
+                    .pointAddr(devicePointInfoEntity.getPointAddr())
+                    .pointValue(String.valueOf(devicePointInfoEntity.getPointValue()))
+                    .timestamp(devicePointInfoEntity.getTimestamp())
                     .build();
             boolean result =  alertMsgDubboService.submit(alertMsgEntity).isSuccess();
             if (!result){

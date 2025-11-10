@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
+ * 设备点位信息表
  * @author whj
  */
 @Data
@@ -35,4 +36,7 @@ public class DevicePointInfoEntity extends BaseEntity {
 
     @TableField(exist = false)
     private Object pointValue;
+
+    @TableField(exist = false)
+    private Long timestamp;
 }

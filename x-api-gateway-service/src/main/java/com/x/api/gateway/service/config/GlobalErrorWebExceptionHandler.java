@@ -13,7 +13,6 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -21,6 +20,8 @@ import java.util.Map;
 /**
  * 全局错误Web异常处理器
  * 处理WebFlux中的所有未捕获异常，提供统一的错误响应格式
+ *
+ * @author whj
  */
 @Component
 @Order(-2)

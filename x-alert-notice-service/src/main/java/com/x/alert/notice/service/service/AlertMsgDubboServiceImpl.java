@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  *  服务实现类
- *
+ *  @author whj
  */
 @Slf4j
 @RestController
@@ -67,7 +67,7 @@ public class AlertMsgDubboServiceImpl implements IAlertMsgDubboService {
      * 新增或修改
      */
     @PostMapping("/submit")
-    public R submit(@RequestBody AlertMsgEntity device) {
+    public R<Object> submit(@RequestBody AlertMsgEntity device) {
         boolean updateResult = alertMsgService.saveOrUpdate(device) ;
         return R.status(updateResult);
     }
@@ -76,7 +76,7 @@ public class AlertMsgDubboServiceImpl implements IAlertMsgDubboService {
      * 逻辑删除
      */
     @GetMapping("/remove")
-    public R remove(@RequestParam(name = "id") Long id) {
+    public R<Object> remove(@RequestParam(name = "id") Long id) {
         boolean updateResult = alertMsgService.removeById(id) ;
         return R.status(updateResult);
     }

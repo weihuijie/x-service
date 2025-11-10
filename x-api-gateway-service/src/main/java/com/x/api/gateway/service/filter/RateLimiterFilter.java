@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 /**
  * 限流过滤器工厂 - 用于创建限流过滤器
  * 扩展AbstractGatewayFilterFactory实现自定义限流逻辑
+ *
+ * @author whj
  */
 @Component
 public class RateLimiterFilter extends AbstractGatewayFilterFactory<RateLimiterFilter.Config> {

@@ -11,6 +11,8 @@ import java.util.Map;
 
 /**
  * 熔断降级控制器 - 处理服务不可用时的降级逻辑
+ *
+ * @author whj
  */
 @Slf4j
 @RestController

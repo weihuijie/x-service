@@ -8,13 +8,12 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 /**
- * @author: whj
  *  mybatis拦截器，自动注入创建人、创建时间、修改人、修改时间
  *
+ * @author: whj
  */
 @Slf4j
 @Component
@@ -36,7 +35,7 @@ public class MetaObjectHandlerConfig implements MetaObjectHandler {
         setFieldValByName("updateUser","system"  , metaObject);
     }
 
-    public MybatisSqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) throws IOException {
+    public MybatisSqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) {
         MybatisSqlSessionFactoryBean mybatisPlus = new MybatisSqlSessionFactoryBean();
         //加载数据源
         mybatisPlus.setDataSource(dataSource);

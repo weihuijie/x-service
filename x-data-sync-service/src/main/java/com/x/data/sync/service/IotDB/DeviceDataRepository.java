@@ -11,12 +11,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * IotDB 数据读写
+ *
+ * @author whj
+ */
 @Slf4j
 @Repository
 public class DeviceDataRepository {
-    private static final String STORAGE_GROUP = "root.iot"; // IOTDB 存储组（类似数据库）
-    // 注入 IOTDB 专属 JdbcTemplate（通过名称匹配）
+    private static final String STORAGE_GROUP = "root.iot"; // IotDB 存储组（类似数据库）
 
+    // 注入 IotDB 专属 JdbcTemplate（通过名称匹配）
     private final JdbcTemplate jdbcTemplate;
 
     public DeviceDataRepository(@Qualifier("iotdbJdbcTemplate") JdbcTemplate jdbcTemplate) {
@@ -29,17 +34,17 @@ public class DeviceDataRepository {
         try {
             // 直接执行创建语句
             jdbcTemplate.execute(createSql);
-            System.out.println("IOTDB 存储组 " + STORAGE_GROUP + " 创建成功！");
+            System.out.println("IotDB 存储组 " + STORAGE_GROUP + " 创建成功！");
         } catch (Exception e) {
             if (e.getMessage().contains("root.iot")) {
                 return; // 忽略该异常，正常退出
             }
             // 其他异常（如连接失败、权限问题）抛出
-            throw new RuntimeException("创建 IOTDB 存储组失败：" + e.getMessage(), e);
+            throw new RuntimeException("创建 IotDB 存储组失败：" + e.getMessage(), e);
         }
     }
 
-    // 注册时间序列（如：root.iot.1001.temperature）
+    // 注册时间序列
     public void createTimeSeries(DevicePointData data) {
         String tsPath = String.format(
                 "%s.%s.%s",
@@ -56,7 +61,7 @@ public class DeviceDataRepository {
 
         try {
             jdbcTemplate.execute(createSql);
-            System.out.println("IOTDB 时间序列 " + tsPath + " 创建成功！");
+            System.out.println("IotDB 时间序列 " + tsPath + " 创建成功！");
         } catch (Exception e) {
             if (!e.getMessage().contains("already exist")) {
                 log.error("注册时间序列异常：",e);
@@ -76,21 +81,21 @@ public class DeviceDataRepository {
             throw new IllegalArgumentException("设备ID、监测点、值均不能为空");
         }
 
-        // 1. 构建设备路径（root.iot.1001）
+        // 构建设备路径
         String devicePath = String.format(
                 "%s.%s",
                 STORAGE_GROUP,
                 wrapNodeName("D_",data.getDeviceId().toString())
         );
-        // 2. 构建监测点路径
+        // 构建监测点路径
         String pointPath = wrapNodeName("P_",data.getId().toString());
 
-        // 3. 时间戳和值处理
+        // 时间戳和值处理
         Long timestamp = data.getTimestamp() == null ? System.currentTimeMillis() : data.getTimestamp();
         Object pointValue = data.getPointValue();
         String valueStr = buildValueString(pointValue); // 简化：假设是FLOAT类型，无需判断pointType
 
-        // 4. 拼接写入SQL（路径带引号）
+        // 拼接写入SQL（路径带引号）
         String sql = String.format(
                 "insert into %s(time, %s) values(%d, %s)",
                 devicePath, pointPath, timestamp, valueStr
@@ -104,15 +109,13 @@ public class DeviceDataRepository {
         }
     }
 
-    // 辅助方法：处理FLOAT类型值（无需单引号）
     private String buildValueString(Object value) {
-        // 若支持TEXT类型，需在此处判断并加引号（参考之前的buildValueString方法）
         return value.toString();
     }
 
     // 查询最新数据
     public DevicePointData queryLatestData(Long deviceId, Long pointId) {
-        // 2. 构建查询 SQL（核心：给 LAST_VALUE 结果加别名 metric_val）
+        // 构建查询 SQL（核心：给 LAST_VALUE 结果加别名 metric_val）
         String querySql = String.format(
                 "select " + wrapNodeName("P_",pointId.toString()) +
                         " as metric_val from "+STORAGE_GROUP+".%s " +
@@ -123,7 +126,7 @@ public class DeviceDataRepository {
         log.info("查询最新数据SQL：{}", querySql);
 
         try {
-            // 3. 执行查询，传入自定义 RowMapper
+            // 执行查询，传入自定义 RowMapper
             return jdbcTemplate.queryForObject(querySql,new DeviceDataRowMapper(deviceId, pointId));
         } catch (EmptyResultDataAccessException e) {
             throw new RuntimeException(String.format("设备 [%d] 指标 [%s] 未查询到时序数据", deviceId, pointId), e);
@@ -134,16 +137,16 @@ public class DeviceDataRepository {
 
     // 查询历史数据（时间范围）
     public List<DevicePointData> queryHistoryData(Long deviceId, Long pointId, String startTime, String endTime) {
-        // 1. 入参校验（避免非法参数导致 SQL 语法错误）
+        // 入参校验（避免非法参数导致 SQL 语法错误）
         if (deviceId == null || pointId == null || startTime == null || endTime == null) {
             throw new IllegalArgumentException("设备ID、指标名、开始时间、结束时间均不能为空");
         }
 
-        // 3. 处理设备路径（合法化，统一用 wrapNodeName 兼容非数字设备ID）
+        //处理设备路径
         String legalDeviceNode = wrapNodeName("D_",deviceId.toString());
         String devicePath = String.format("%s.%s", STORAGE_GROUP, legalDeviceNode); // 如：root.iot.1001
 
-        // 4. 构建 SQL（无占位符、加列别名、时间范围拼接）
+        //构建 SQL（无占位符、加列别名、时间范围拼接）
         String sql = String.format(
                 "SELECT " + wrapNodeName("P_",pointId.toString()) +
                         " as metric_val FROM " + devicePath +
@@ -156,10 +159,10 @@ public class DeviceDataRepository {
         log.info("查询历史数据SQL：{}", sql);
 
         try {
-            // 5. 执行查询，复用之前优化的 DeviceDataRowMapper（通过别名 metric_val 获取值）
+            //执行查询
             return jdbcTemplate.query(sql, new DeviceDataRowMapper(deviceId, pointId));
         } catch (Exception e) {
-            // 6. 增强异常信息：包含完整 SQL、参数，快速定位问题
+            //增强异常信息：包含完整 SQL、参数，快速定位问题
             throw new RuntimeException(
                     String.format(
                             "查询历史时序数据失败：deviceId=%d, pointId=%s, 时间范围=[%s, %s], SQL=%s, 原因=%s",

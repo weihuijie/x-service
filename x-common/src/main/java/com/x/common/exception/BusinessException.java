@@ -1,13 +1,22 @@
 package com.x.common.exception;
 
 import com.x.common.base.IResultCode;
+import lombok.Getter;
 
 /**
  * 业务异常类 - 用于封装业务逻辑中的错误
  * 与ResultCode结合使用，便于统一处理业务异常
+ *
+ * @author whj
  */
+@Getter
 public class BusinessException extends RuntimeException {
-    
+
+    /**
+     * -- GETTER --
+     *  获取异常状态码
+     *
+     */
     private final int code;
     
     /**
@@ -28,15 +37,7 @@ public class BusinessException extends RuntimeException {
         super(resultCode.getMessage());
         this.code = resultCode.getCode();
     }
-    
-    /**
-     * 获取异常状态码
-     * @return 状态码
-     */
-    public int getCode() {
-        return code;
-    }
-    
+
     /**
      * 创建业务异常的便捷方法
      * @param code 状态码

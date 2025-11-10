@@ -15,6 +15,8 @@ import java.util.function.Predicate;
 /**
  * 自定义请求参数断言工厂
  * 根据请求参数进行路由判断
+ *
+ * @author whj
  */
 @Component
 public class QueryParamRoutePredicateFactory extends AbstractRoutePredicateFactory<QueryParamRoutePredicateFactory.Config> {

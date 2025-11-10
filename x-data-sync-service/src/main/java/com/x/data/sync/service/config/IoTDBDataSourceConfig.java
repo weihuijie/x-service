@@ -10,14 +10,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 /**
- * IoTDB 从数据源配置（无需@Primary，与MySQL数据源区分）
+ * IotDB 从数据源配置
+ *
+ * @author whj
  */
 @Slf4j
 @Configuration
 public class IoTDBDataSourceConfig {
 
     /**
-     * 1. 创建IoTDB数据源（绑定application.yml中spring.datasource.iotdb前缀的配置）
+     * 创建IoTDB数据源
      */
     @Bean(name = "iotdb")
     @ConfigurationProperties(prefix = "spring.datasource.iotdb")
@@ -25,7 +27,9 @@ public class IoTDBDataSourceConfig {
         return new HikariDataSource();
     }
 
-    // 初始化 IOTDB 专属 JdbcTemplate
+    /**
+     * 初始化 IotDB 专属 JdbcTemplate
+     */
     @Bean(name = "iotdbJdbcTemplate")
     public JdbcTemplate iotdbJdbcTemplate(
             @org.springframework.beans.factory.annotation.Qualifier("iotdb") DataSource dataSource

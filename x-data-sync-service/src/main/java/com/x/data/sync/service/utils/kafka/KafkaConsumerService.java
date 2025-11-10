@@ -19,6 +19,8 @@ import java.util.List;
 
 /**
  * Kafka 消费者服务（生产级优化：重试、死信、幂等、异常处理、配置解耦）
+ *
+ * @author whj
  */
 @Slf4j
 @Component

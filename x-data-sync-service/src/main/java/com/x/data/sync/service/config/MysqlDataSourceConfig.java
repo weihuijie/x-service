@@ -11,14 +11,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 /**
- * MySQL 主数据源配置（@Primary 标识主数据源，避免冲突）
+ * MySQL 主数据源配置
  */
 @Slf4j
 @Configuration
 public class MysqlDataSourceConfig {
 
 
-    // 绑定 MySQL 数据源配置（spring.datasource.mysql），@Primary 指定为默认数据源
+    /**
+     * 创建 MySQL 数据源
+     */
     @Primary
     @Bean(name = "mysql")
     @ConfigurationProperties(prefix = "spring.datasource.mysql")
@@ -26,7 +28,9 @@ public class MysqlDataSourceConfig {
         return new HikariDataSource();
     }
 
-    // 初始化 MySQL 专属 JdbcTemplate（默认 JdbcTemplate，若不指定 Qualifier 则注入此对象）
+    /**
+     * 初始化 MySQL 专属 JdbcTemplate （默认 JdbcTemplate，若不指定 Qualifier 则注入此对象）
+     */
     @Primary
     @Bean(name = "mysqlJdbcTemplate")
     public JdbcTemplate mysqlJdbcTemplate(

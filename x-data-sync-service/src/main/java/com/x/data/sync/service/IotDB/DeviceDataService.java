@@ -6,6 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 设备数据服务
+ *
+ * @author whj
+ */
 @Service
 @RequiredArgsConstructor
 public class DeviceDataService {

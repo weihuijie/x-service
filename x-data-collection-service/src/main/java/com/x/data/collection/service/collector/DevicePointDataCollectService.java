@@ -19,7 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
+/**
+ * 设备点位数据采集服务
+ *
+ *   @author whj
+ */
 @Slf4j
 @Component
 public class DevicePointDataCollectService {
@@ -49,6 +53,8 @@ public class DevicePointDataCollectService {
                     .map(e -> PlcReadDto.build(e.getPointAddr(), PlcValueType.getByCode(e.getPointType()))).filter(Objects::nonNull).toList();
             // 发送 PLC 请求
             List<PlcReadDto<Object>> plcData = plcService.getPlcData(plcReadDtoList, deviceInfoEntity.getPlcCode(), 1000);
+            // 时间戳
+            Long timestamp = System.currentTimeMillis();
             // 将结果转成map ， key = pointAddr, value = pointValue
             Map<String, Object> collectMap = plcData.stream().collect(Collectors.toMap(PlcReadDto::getAddress, PlcReadDto::getValue, (o, n) -> n));
             // 赋值给点位信息
@@ -58,6 +64,7 @@ public class DevicePointDataCollectService {
                     continue;
                 }
                 deviceCollectPoint.setPointValue(collectMap.get(deviceCollectPoint.getPointAddr()));
+                deviceCollectPoint.setTimestamp(timestamp);
                 sendData.add(deviceCollectPoint);
             }
             log.info("设备：{}，点位信息：{}", deviceInfoEntity.getDeviceName(), deviceCollectPoints);

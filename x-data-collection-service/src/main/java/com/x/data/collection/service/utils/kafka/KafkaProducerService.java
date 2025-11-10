@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Kafka 生产者服务（发送消息到 test-topic 主题）
+ * Kafka 生产者服务
+ *
+ * @author whj
  */
 @Slf4j
 @Component

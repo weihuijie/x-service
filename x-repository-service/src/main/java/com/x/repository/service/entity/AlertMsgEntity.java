@@ -35,4 +35,6 @@ public class AlertMsgEntity extends BaseEntity {
     private String pointAddr;
 
     private String pointValue;
+
+    private Long timestamp;
 }

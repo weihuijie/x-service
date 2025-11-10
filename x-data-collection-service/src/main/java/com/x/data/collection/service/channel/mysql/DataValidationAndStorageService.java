@@ -13,6 +13,9 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * 数据校验和MySQL存储服务
  * 用于校验IoTDB中的数据并存储到MySQL中
+ *
+ * @author whj
+ *
  */
 @Slf4j
 @Service

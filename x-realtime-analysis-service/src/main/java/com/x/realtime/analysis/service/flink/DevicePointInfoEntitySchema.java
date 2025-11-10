@@ -7,16 +7,17 @@ import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
  * 传感器数据序列化/反序列化类
+ *
+ * @author whj
  */
 public class DevicePointInfoEntitySchema implements SerializationSchema<DevicePointInfoEntity>, DeserializationSchema<DevicePointInfoEntity> {
 
     @Override
-    public DevicePointInfoEntity deserialize(byte[] message) throws IOException {
+    public DevicePointInfoEntity deserialize(byte[] message) {
         String rawData = new String(message, StandardCharsets.UTF_8);
         try {
             return JSONObject.parseObject(rawData, DevicePointInfoEntity.class);

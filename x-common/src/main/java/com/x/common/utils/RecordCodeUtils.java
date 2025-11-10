@@ -4,7 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
-// 工单编码
+/**
+ * 获取编号
+ *
+ *  @author whj
+ */
 public class RecordCodeUtils {
     public static String getCode(String prefix) {
         StringBuilder sb = new StringBuilder();

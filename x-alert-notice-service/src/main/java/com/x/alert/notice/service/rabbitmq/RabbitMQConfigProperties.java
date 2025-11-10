@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * RabbitMQ 连接配置（从 application.yml 注入）
+ * RabbitMQ 连接配置
  */
 @Data
 @Component

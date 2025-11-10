@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+/**
+ *  服务接口
+ *
+ *  @author whj
+ */
 public interface IDeviceInfoDubboService {
 
     /**
@@ -31,10 +36,10 @@ public interface IDeviceInfoDubboService {
     /**
      * 新增或修改
      */
-    R submit(@Valid @RequestBody DeviceInfoEntity device);
+    R<Object> submit(@Valid @RequestBody DeviceInfoEntity device);
 
     /**
      * 逻辑删除
      */
-    R remove(@RequestParam(name = "id") Long id);
+    R<Object> remove(@RequestParam(name = "id") Long id);
 }

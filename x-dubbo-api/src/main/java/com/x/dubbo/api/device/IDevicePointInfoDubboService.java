@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+/**
+ *  服务接口
+ *
+ * @author whj
+ */
 public interface IDevicePointInfoDubboService {
 
     /**
