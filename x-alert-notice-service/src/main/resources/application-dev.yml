@@ -45,4 +45,4 @@ rabbitmq:
 
 logging:
   level:
-    com.x.alert.notice.service: debug
+    com.x.alert.notice.service: info

@@ -4,17 +4,21 @@ server:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/plain,text/css,application/javascript
 
+
+
 spring:
   application:
     name: x-api-gateway-service
   cloud:
     gateway:
-      # 启用熔断
-      default-filters:
-        - name: CircuitBreaker
-          args:
-            name: defaultCircuitBreaker
-            fallbackUri: forward:/fallback
+
+
+      #      # 启用熔断
+#      default-filters:
+#        - name: CircuitBreaker
+#          args:
+#            name: defaultCircuitBreaker
+#            fallbackUri: forward:/fallback
       routes:
         - id: x-device-service
           uri: lb://x-device-access-service
@@ -28,6 +32,9 @@ spring:
           uri: lb://x-data-collection-service
           predicates:
             - Path=/data/collection/**
+          metadata:
+            response-timeout: 10000  # 路由级响应超时（10s）
+            connect-timeout: 5000    # 路由级连接超时（5s）
         - id: x-auth-service
           uri: lb://x-auth-service
           predicates:
@@ -51,21 +58,21 @@ spring:
               args:
                 name: X-Response-Time
                 value: "N/A"
-    # 负载均衡配置
-    loadbalancer:
-      ribbon:
-        enabled: false
+      httpclient:
+        # 超时配置（平衡速度与容错）
+        connect-timeout: 5000                    # 网关→后端建连超时（5s）
+        response-timeout: 10000                  # 等待后端响应超时（10s）
+        # 连接池配置（3000 QPS 关键：复用连接，减少建连开销）
+        pool:
+          max-connections: 400                   # 最大连接数（按 3000 QPS 计算，留缓冲）
+          max-idle-time: 300000                  # 连接最大存活时间（5分钟）
+
     # Nacos服务发现配置
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
         namespace: public
         group: DEFAULT_GROUP
-      config:
-        # 配置中心地址
-        server-addr: 127.0.0.1:8848
-        # 配置文件格式
-        file-extension: yml
   # Redis配置
   data:
     redis:
@@ -74,21 +81,21 @@ spring:
       database: 0
       timeout: 2000ms
 
-# 熔断器配置
-resilience4j:
-  circuitbreaker:
-    instances:
-      defaultCircuitBreaker:
-        slidingWindowSize: 10
-        failureRateThreshold: 50
-        waitDurationInOpenState: 5000
-        permittedNumberOfCallsInHalfOpenState: 3
-        slidingWindowType: TIME_BASED
-        minimumNumberOfCalls: 5
-      manageServiceCircuitBreaker:
-        slidingWindowSize: 10
-        failureRateThreshold: 40
-        waitDurationInOpenState: 3000
+## 熔断器配置
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      defaultCircuitBreaker:
+#        slidingWindowSize: 10
+#        failureRateThreshold: 50
+#        waitDurationInOpenState: 5000
+#        permittedNumberOfCallsInHalfOpenState: 3
+#        slidingWindowType: TIME_BASED
+#        minimumNumberOfCalls: 5
+#      manageServiceCircuitBreaker:
+#        slidingWindowSize: 10
+#        failureRateThreshold: 40
+#        waitDurationInOpenState: 3000
 
 # 监控配置
 management:
@@ -109,5 +116,5 @@ management:
 # 日志配置
 logging:
   level:
-    com.x.api.gateway.service: debug
+    com.x.api.gateway.service: info
     org.springframework.cloud.gateway: info

@@ -44,7 +44,7 @@ public class DeviceDataHttpAdapter {
     public ResponseEntity<String> receiveDeviceData(
             @PathVariable("deviceCode") String deviceCode,
             @RequestBody Object data) {
-
+        long startTime = System.currentTimeMillis();
         // 数据校验
         ValidationResult validationResult = deviceDataValidator.validateDeviceData(deviceCode, data);
         if (!validationResult.isValid()) {
@@ -63,6 +63,8 @@ public class DeviceDataHttpAdapter {
             }
         }, deviceDataExecutor);
 
+        long endTime = System.currentTimeMillis();
+        log.info("处理设备数据完成: deviceCode={}, cost={}ms", deviceCode, endTime - startTime);
         // 立即返回响应，提高吞吐量
         return ResponseEntity.ok("{\"status\":\"success\"}");
     }

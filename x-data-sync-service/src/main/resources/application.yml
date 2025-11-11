@@ -24,3 +24,19 @@ mybatis-plus:
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+# Dubbo配置
+dubbo:
+  consumer:
+    check: false # 禁用启动检测
+    lazy: true   # 全局延迟注入，避免时机冲突
+  application:
+    name: ${spring.application.name}
+    logger: slf4j
+    qos-enable: false # 可选，默认true, QOS 服务治理功能
+  registry:
+    address: nacos://nacos:nacos@127.0.0.1:8848
+    register-mode: instance
+  protocols:
+    tri-id:
+      name: tri
+      port: -1

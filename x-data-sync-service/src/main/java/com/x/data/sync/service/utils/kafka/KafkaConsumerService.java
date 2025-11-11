@@ -1,24 +1,22 @@
 package com.x.data.sync.service.utils.kafka;
 
 import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONException;
-import com.x.data.sync.service.IotDB.DevicePointData;
 import com.x.data.sync.service.IotDB.DeviceDataService;
+import com.x.data.sync.service.IotDB.DevicePointData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.ConsumerSeekAware;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Kafka 消费者服务（生产级优化：重试、死信、幂等、异常处理、配置解耦）
+ * Kafka 消费者服务（批量消费，无循环依赖）
  *
  * @author whj
  */
@@ -29,68 +27,76 @@ public class KafkaConsumerService implements ConsumerSeekAware {
 
     private final DeviceDataService deviceDataService;
 
+    // 分批写入IotDB的最大条数（从配置文件读取）
+    @Value("${kafka.consumer.write-batch-size:500}")
+    private int writeBatchSize;
+
     /**
-     * 核心消费方法（优化点：配置解耦、重试、幂等、格式校验、死信转发）
-     * @param record 消息记录
+     * 批量消费核心方法（引用独立配置的容器工厂）
      */
-    @Retryable(
-            // 可重试异常：仅对业务异常、网络波动等临时异常重试
-            retryFor = {RuntimeException.class, JSONException.class},
-            // 重试策略：指数退避（1s → 2s → 4s，避免频繁重试压垮服务）
-            backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 4000),
-            // 最大重试次数（配置文件读取，灵活调整）
-            maxAttemptsExpression = "${kafka.consumer.max-retry-attempts:3}"
-    )
     @KafkaListener(
             topics = "${kafka.consumer.topic:test-topic}",
             groupId = "${kafka.consumer.group-id:data-sync-group}",
-            // 并发消费：提高吞吐量（配置文件读取，根据分区数调整，建议 ≤ 分区数）
-            concurrency = "${kafka.consumer.concurrency:3}",
-            // 手动提交 Offset：确保消息处理成功后再提交，避免消息丢失
-            properties = {
-                    "enable.auto.commit=false", // 关闭自动提交
-                    "auto.offset.reset=earliest", // 无偏移量时从最新消息开始消费（可配置为 earliest）
-                    "session.timeout.ms=10000", // 会话超时时间
-                    "heartbeat.interval.ms=3000" // 心跳间隔（建议为会话超时的 1/3）
-            },
-            clientIdPrefix = "data-collection-consumer-sync-"// 客户端 ID 前缀（可配置为全局唯一）
+            containerFactory = "batchKafkaListenerContainerFactory" // 引用配置类中的工厂Bean
     )
-    public void consumeMessage(
-            ConsumerRecord<String, String> record,
-            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
-            @Header(KafkaHeaders.OFFSET) long offset
-    ) {
-        // 构建唯一标识（主题+分区+偏移量）：用于幂等性校验
-        String uniqueKey = String.format("%s-%d-%d", record.topic(), partition, offset);
-        log.info("【开始消费消息】唯一标识：{}，Key：{}，消息内容：{}", uniqueKey, record.key(), record.value());
+    public void batchConsume(List<ConsumerRecord<String, String>> records, Acknowledgment acknowledgment) {
+        log.debug("【开始批量消费】本次消费消息数：{}", records.size());
+        long startTime = System.currentTimeMillis();
+
+        if (records.isEmpty()) {
+            acknowledgment.acknowledge(); // 空批次直接提交偏移量
+            return;
+        }
+
+        // 保存原始消息Key（用于异常日志）
+        List<String> recordKeys = records.stream()
+                .map(ConsumerRecord::key)
+                .collect(Collectors.toList());
 
         try {
-            // 核心业务处理（替换为实际业务逻辑，如数据库存储、RPC 调用等）
-            processBusinessLogic(record);
+            for (ConsumerRecord<String, String> record : records) {
+                log.debug("【批量消费详情】Key：{}，内容：{}", record.key(), record.value());
+                List<DevicePointData> deviceDataList = JSONArray.parseArray(record.value(), DevicePointData.class);
+                if (deviceDataList != null && !deviceDataList.isEmpty()) {
+                    batchWriteToIotDB(deviceDataList);
+                }
+            }
+            // 所有数据处理成功，提交偏移量（原子提交）
+            acknowledgment.acknowledge();
+            log.info("【批量消费成功】耗时：{}ms", System.currentTimeMillis() - startTime);
+            log.debug("【批量消费成功】消息Keys：{}，已提交偏移量", recordKeys);
 
         } catch (Exception e) {
-            log.error("【消费失败】唯一标识：{}，消息处理异常", uniqueKey, e);
-            // 抛出异常触发重试（@Retryable 会捕获并重试）
-            throw new RuntimeException("消息消费业务处理失败", e);
+            log.error("【批量消费失败】消息Keys：{}，处理异常", recordKeys, e);
+            // 不提交偏移量，触发重试（需配合配置类中的错误处理器）
+            throw new RuntimeException("批量消费业务处理失败，等待重试", e);
         }
     }
 
     /**
-     * 核心业务处理（替换为实际业务逻辑）
+     * 分批写入IotDB（拆分大批次，降低写入压力）
      */
-    private void processBusinessLogic(ConsumerRecord<String, String> record) {
-        // 示例：打印消息详情（实际场景可替换为：数据库存储、缓存更新、业务计算等）
-        String key = record.key();
-        String value = record.value();
-        String topic = record.topic();
-        int partition = record.partition();
-        long offset = record.offset();
+    private void batchWriteToIotDB(List<DevicePointData> allDeviceData) {
+        int totalSize = allDeviceData.size();
+        int batchCount = (totalSize + writeBatchSize - 1) / writeBatchSize; // 向上取整计算分批次数
 
-//        log.info("【业务处理】主题：{}，分区：{}，偏移量：{}，Key：{}，消息：{}",
-//                topic, partition, offset, key, value);
-        List<DevicePointData> devicePointData = JSONArray.parseArray(value, DevicePointData.class);
-        for (DevicePointData deviceDatum : devicePointData) {
-            deviceDataService.writeData(deviceDatum);
+        log.debug("【开始分批写入】总条数：{}，分批次数：{}，每批大小：{}",
+                totalSize, batchCount, writeBatchSize);
+
+        for (int i = 0; i < batchCount; i++) {
+            int startIndex = i * writeBatchSize;
+            int endIndex = Math.min((i + 1) * writeBatchSize, totalSize);
+            List<DevicePointData> batchData = allDeviceData.subList(startIndex, endIndex);
+
+            try {
+                log.debug("【写入第{}批】条数：{}", i + 1, batchData.size());
+                deviceDataService.writeBatchData(batchData);
+            } catch (Exception e) {
+                log.error("【第{}批写入失败】条数：{}", i + 1, batchData.size(), e);
+                throw new RuntimeException("分批写入IotDB失败", e); // 触发整体重试
+            }
         }
+
+        log.debug("【所有批次写入成功】总条数：{}", totalSize);
     }
 }

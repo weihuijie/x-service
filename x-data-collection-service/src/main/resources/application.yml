@@ -41,7 +41,7 @@ spring:
 
 logging:
   level:
-    com.x.data.collection.service: debug
+    com.x.data.collection.service: info
 
 plc-os:
   ip: 192.168.1.1

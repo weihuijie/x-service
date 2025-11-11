@@ -1,28 +1,30 @@
 package com.x.data.sync.service.IotDB;
 
 import com.x.data.sync.service.enums.IotValueType;
+import com.x.dubbo.api.device.IDevicePointInfoDubboService;
+import com.x.repository.service.entity.DevicePointInfoEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * IotDB 数据读写
- *
- * @author whj
- */
 @Slf4j
-@Repository
+@Component
 public class DeviceDataRepository {
     private static final String STORAGE_GROUP = "root.iot"; // IotDB 存储组（类似数据库）
 
     // 注入 IotDB 专属 JdbcTemplate（通过名称匹配）
     private final JdbcTemplate jdbcTemplate;
+
+    @DubboReference(version = "1.0.0")
+    private IDevicePointInfoDubboService devicePointInfoDubboService;
 
     public DeviceDataRepository(@Qualifier("iotdbJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -34,7 +36,7 @@ public class DeviceDataRepository {
         try {
             // 直接执行创建语句
             jdbcTemplate.execute(createSql);
-            System.out.println("IotDB 存储组 " + STORAGE_GROUP + " 创建成功！");
+            log.debug("IotDB 存储组 " + STORAGE_GROUP + " 创建成功！");
         } catch (Exception e) {
             if (e.getMessage().contains("root.iot")) {
                 return; // 忽略该异常，正常退出
@@ -45,26 +47,40 @@ public class DeviceDataRepository {
     }
 
     // 注册时间序列
-    public void createTimeSeries(DevicePointData data) {
-        String tsPath = String.format(
-                "%s.%s.%s",
-                STORAGE_GROUP,
-                wrapNodeName("D_",data.getDeviceId().toString()), // 设备ID是数字，无需包裹，但统一调用方法更规范
-                wrapNodeName("P_",data.getId().toString())
-        );
-        String dataType = IotValueType.getDescByCode(data.getPointType());
-        String createSql = String.format(
-                "create timeseries %s with datatype=%s,encoding=PLAIN",
-                tsPath,
-                dataType
-        );
+    public void createTimeSeries() {
+        List<DevicePointInfoEntity> list = devicePointInfoDubboService.list(new DevicePointInfoEntity()).getData();
+        if (ObjectUtils.isEmpty(list)) {
+            log.warn("没有找到任何设备点信息，跳过创建时间序列");
+            return;
+        }
+        for (DevicePointInfoEntity data : list) {
+            // 验证必要字段
+            if (data.getDeviceId() == null || data.getId() == null || data.getPointType() == null) {
+                log.warn("设备数据缺少必要字段，跳过创建时间序列: deviceId={}, id={}, pointType={}",
+                        data.getDeviceId(), data.getId(), data.getPointType());
+                return;
+            }
 
-        try {
-            jdbcTemplate.execute(createSql);
-            System.out.println("IotDB 时间序列 " + tsPath + " 创建成功！");
-        } catch (Exception e) {
-            if (!e.getMessage().contains("already exist")) {
-                log.error("注册时间序列异常：",e);
+            String tsPath = String.format(
+                    "%s.%s.%s",
+                    STORAGE_GROUP,
+                    wrapNodeName("D_",data.getDeviceId().toString()), // 设备ID是数字，无需包裹，但统一调用方法更规范
+                    wrapNodeName("P_",data.getId().toString())
+            );
+            String dataType = IotValueType.getDescByCode(data.getPointType());
+            String createSql = String.format(
+                    "create timeseries %s with datatype=%s,encoding=PLAIN",
+                    tsPath,
+                    dataType
+            );
+
+            try {
+                jdbcTemplate.execute(createSql);
+                log.debug("IotDB 时间序列 {} 创建成功！", tsPath);
+            } catch (Exception e) {
+                if (!e.getMessage().contains("already exist")) {
+                    log.error("注册时间序列异常：",e);
+                }
             }
         }
     }
@@ -108,7 +124,68 @@ public class DeviceDataRepository {
         }
     }
 
+    // 批量写入数据
+    public void insertBatchData(List<DevicePointData> dataList) {
+        if (dataList == null || dataList.isEmpty()) {
+            return;
+        }
+
+        // 过滤掉不完整的数据
+        List<DevicePointData> validDataList = dataList.stream()
+                .filter(data -> data.getDeviceId() != null && data.getId() != null && data.getPointValue() != null)
+                .toList();
+        
+        if (validDataList.isEmpty()) {
+            log.warn("没有有效的数据用于批量插入");
+            return;
+        }
+
+        // 构建批量插入SQL
+        StringBuilder sqlBuilder = new StringBuilder("insert into ");
+        
+        // 所有数据应该属于同一设备，取第一条有效数据的设备ID
+        Long deviceId = validDataList.get(0).getDeviceId();
+        String devicePath = String.format(
+                "%s.%s",
+                STORAGE_GROUP,
+                wrapNodeName("D_", deviceId.toString())
+        );
+        sqlBuilder.append(devicePath);
+        sqlBuilder.append("(");
+        // 添加所有监测点列
+        for (DevicePointData data : validDataList) {
+            String pointPath = wrapNodeName("P_", data.getId().toString());
+            sqlBuilder.append(pointPath).append(", ");
+        }
+        sqlBuilder.append("time");
+        
+        sqlBuilder.append(") values (");
+
+        // 添加所有数据行
+//        long timestamp = System.currentTimeMillis();
+        for (DevicePointData data : validDataList) {
+//            timestamp = data.getTimestamp() == null ? System.currentTimeMillis() : data.getTimestamp();
+            // 添加该行所有监测点的值
+            Object pointValue = data.getPointValue();
+            String valueStr = buildValueString(pointValue);
+            sqlBuilder.append(valueStr).append(",");
+        }
+        sqlBuilder.append(System.currentTimeMillis());
+        sqlBuilder.append(")");
+
+
+        try {
+            jdbcTemplate.execute(sqlBuilder.toString());
+        } catch (Exception e) {
+            log.error("批量写入时序数据失败：{}", sqlBuilder.toString(), e);
+            throw new RuntimeException("批量写入时序数据失败，原因：" + e.getMessage(), e);
+        }
+    }
+
     private String buildValueString(Object value) {
+        if (value == null) {
+            return "NULL";
+        }
         return value.toString();
     }
 

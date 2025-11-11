@@ -16,14 +16,13 @@
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-common</artifactId>
-            <version>1.0.0</version>
+            <version>${version}</version>
         </dependency>
 
-        <!-- gRPC依赖 -->
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-dubbo-api</artifactId>
-            <version>1.0.0</version>
+            <version>${version}</version>
             <exclusions>
                 <!-- 排除 JDBC starter，核心是阻止 DataSourceAutoConfiguration 触发 -->
                 <exclusion>

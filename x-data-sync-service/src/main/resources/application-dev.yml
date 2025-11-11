@@ -37,3 +37,16 @@ spring:
 logging:
   level:
     com.x.alert.notice.service: debug
+
+kafka:
+  bootstrap-servers: 127.0.0.1:9092 # Kafka集群地址
+  consumer:
+    group-id: data-sync-group # 消费组ID
+    topic: test-topic # 消费主题
+    batch-size: 100 # 每次poll最大消息数
+    fetch-min-size: 10240 # 拉取最小字节数（10KB）
+    fetch-max-wait-ms: 500 # 拉取最大等待时间（500ms）
+    concurrency: 3 # 并发消费者数量（建议≤分区数）
+    write-batch-size: 500 # 每批写入IotDB的最大条数
+    auto-offset-reset: latest # 偏移量重置策略
+    enable-auto-commit: false # 关闭自动提交

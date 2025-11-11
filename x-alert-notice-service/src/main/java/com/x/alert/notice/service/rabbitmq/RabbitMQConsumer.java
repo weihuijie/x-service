@@ -87,7 +87,7 @@ public class RabbitMQConsumer {
         // 创建消费者回调
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody());
-            log.info("收到RabbitMQ消息: {}", message);
+            log.debug("收到RabbitMQ消息: {}", message);
             
             try {
                 // 处理消息
