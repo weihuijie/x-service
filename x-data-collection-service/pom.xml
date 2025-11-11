@@ -93,6 +93,19 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
+        <!-- MQTT依赖 -->
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-mqtt</artifactId>
+        </dependency>
+        
+        <!-- Guava工具类 -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
+        </dependency>
+
     </dependencies>
 
 </project>

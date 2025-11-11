@@ -27,6 +27,18 @@ spring:
     # 增加IoTDB连接池配置
     max-size: 50
 
+  # MQTT配置
+  mqtt:
+    broker:
+      url: tcp://localhost:1883
+    client:
+      id: data-collection-service
+    username: 
+    password: 
+    topic:
+      device:
+        data: device/+/data
+
 logging:
   level:
     com.x.data.collection.service: debug

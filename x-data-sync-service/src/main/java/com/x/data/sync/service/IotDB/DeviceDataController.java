@@ -12,7 +12,7 @@ import java.util.List;
  * @author whj
  */
 @RestController
-@RequestMapping("/api/device-data")
+@RequestMapping("/data/sync")
 @RequiredArgsConstructor
 public class DeviceDataController {
     private final DeviceDataService deviceDataService;

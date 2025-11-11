@@ -86,8 +86,8 @@ public class KafkaConsumerService implements ConsumerSeekAware {
         int partition = record.partition();
         long offset = record.offset();
 
-        log.info("【业务处理】主题：{}，分区：{}，偏移量：{}，Key：{}，消息：{}",
-                topic, partition, offset, key, value);
+//        log.info("【业务处理】主题：{}，分区：{}，偏移量：{}，Key：{}，消息：{}",
+//                topic, partition, offset, key, value);
         List<DevicePointData> devicePointData = JSONArray.parseArray(value, DevicePointData.class);
         for (DevicePointData deviceDatum : devicePointData) {
             deviceDataService.writeData(deviceDatum);

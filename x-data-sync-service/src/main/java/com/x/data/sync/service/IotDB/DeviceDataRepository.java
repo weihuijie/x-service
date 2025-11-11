@@ -103,7 +103,6 @@ public class DeviceDataRepository {
 
         try {
             jdbcTemplate.execute(sql);
-            System.out.println("时序数据写入成功：" + sql);
         } catch (Exception e) {
             throw new RuntimeException("写入时序数据失败：" + sql + "，原因：" + e.getMessage(), e);
         }

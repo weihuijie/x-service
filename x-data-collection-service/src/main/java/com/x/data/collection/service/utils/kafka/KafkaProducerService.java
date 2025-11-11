@@ -39,12 +39,12 @@ public class KafkaProducerService {
         future.whenComplete((result, ex) -> {
             if (ex == null) {
                 // 发送成功：打印主题、分区、偏移量等信息
-                System.out.printf("【异步发送成功】主题：%s，分区：%d，偏移量：%d，Key：%s，消息：%s%n",
-                        result.getRecordMetadata().topic(),
-                        result.getRecordMetadata().partition(),
-                        result.getRecordMetadata().offset(),
-                        key,
-                        message);
+//                System.out.printf("【异步发送成功】主题：%s，分区：%d，偏移量：%d，Key：%s，消息：%s%n",
+//                        result.getRecordMetadata().topic(),
+//                        result.getRecordMetadata().partition(),
+//                        result.getRecordMetadata().offset(),
+//                        key,
+//                        message);
             } else {
                 // 发送失败：打印异常信息
                 System.err.printf("【异步发送失败】Key：%s，消息：%s，异常：%s%n",

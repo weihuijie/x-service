@@ -16,7 +16,24 @@ spring:
             name: defaultCircuitBreaker
             fallbackUri: forward:/fallback
       routes:
-        - id: manage-service
+        - id: x-device-service
+          uri: lb://x-device-access-service
+          predicates:
+            - Path=/device/**
+        - id: x-data-sync-service
+          uri: lb://x-data-sync-service
+          predicates:
+            - Path=/data/sync/**
+        - id: x-data-collection-service
+          uri: lb://x-data-collection-service
+          predicates:
+            - Path=/data/collection/**
+        - id: x-auth-service
+          uri: lb://x-auth-service
+          predicates:
+            - Path=/auth/**
+
+        - id: x-manage-service
           uri: lb://x-manage-service
           predicates:
             - Path=/manage/**
@@ -25,79 +42,15 @@ spring:
               args:
                 name: manageServiceCircuitBreaker
                 fallbackUri: forward:/fallback/manage
-        - id: x-device-service
-          uri: lb://x-device-access-service
-          predicates:
-            - Path=/device/**
-        - id: x-data-sync-service
-          uri: lb://x-data-sync-service
-          predicates:
-            - Path=/device-data/**
-        - id: x-auth-service
-          uri: lb://x-auth-service
-          predicates:
-            - Path=/auth/**
-          filters:
-
         - id: file-service
           uri: lb://x-file-service
           predicates:
             - Path=/file/**
           filters:
-
             - name: AddResponseHeader
               args:
                 name: X-Response-Time
                 value: "N/A"
-        - id: alert-service
-          uri: lb://x-alert-notice-service
-          predicates:
-            - Path=/alert/**
-          filters:
-
-        - id: data-service
-          uri: lb://x-data-collection-service
-          predicates:
-            - Path=/data/**
-          filters:
-
-        - id: config-service
-          uri: lb://x-config-center-service
-          predicates:
-            - Path=/config/**
-          filters:
-
-        - id: repository-service
-          uri: lb://x-repository-service
-          predicates:
-            - Path=/repository/**
-          filters:
-
-        - id: offline-analysis-service
-          uri: lb://x-offline-analysis-service
-          predicates:
-            - Path=/offline-analysis/**
-          filters:
-
-        - id: realtime-analysis-service
-          uri: lb://x-realtime-analysis-service
-          predicates:
-            - Path=/realtime-analysis/**
-          filters:
-
-        - id: task-scheduler-service
-          uri: lb://x-task-scheduler-service
-          predicates:
-            - Path=/task/**
-          filters:
-
-        # 添加默认路由，处理API网关内部的API请求
-        - id: api-gateway-internal
-          uri: lb://x-api-gateway-service
-          predicates:
-            - Path=/api-gateway/api/**
-          filters:
-
     # 负载均衡配置
     loadbalancer:
       ribbon:

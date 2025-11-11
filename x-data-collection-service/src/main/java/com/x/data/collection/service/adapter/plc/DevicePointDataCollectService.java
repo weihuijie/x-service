@@ -1,4 +1,4 @@
-package com.x.data.collection.service.collector;
+package com.x.data.collection.service.adapter.plc;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.x.data.collection.service.utils.kafka.KafkaProducerService;
