@@ -1,6 +1,8 @@
 package com.x.data.sync.service.IotDB;
 
+import com.x.repository.service.entity.DevicePointInfoEntity;
 import org.springframework.jdbc.core.RowMapper;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -9,7 +11,7 @@ import java.sql.SQLException;
  *
  * @author whj
  */
-public class DeviceDataRowMapper implements RowMapper<DevicePointData> {
+public class DeviceDataRowMapper implements RowMapper<DevicePointInfoEntity> {
     private final Long deviceId;
     private final Long pointId; // 原始指标名（如 DBD1000.DB100）
 
@@ -20,8 +22,8 @@ public class DeviceDataRowMapper implements RowMapper<DevicePointData> {
     }
 
     @Override
-    public DevicePointData mapRow(ResultSet rs, int rowNum) throws SQLException {
-        DevicePointData data = new DevicePointData();
+    public DevicePointInfoEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+        DevicePointInfoEntity data = new DevicePointInfoEntity();
         data.setDeviceId(deviceId);
         data.setId(pointId); // 存储原始指标名，符合业务使用习惯
 

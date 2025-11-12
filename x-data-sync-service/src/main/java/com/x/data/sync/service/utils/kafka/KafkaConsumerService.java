@@ -2,7 +2,7 @@ package com.x.data.sync.service.utils.kafka;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.x.data.sync.service.IotDB.DeviceDataService;
-import com.x.data.sync.service.IotDB.DevicePointData;
+import com.x.repository.service.entity.DevicePointInfoEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Kafka 消费者服务（批量消费，无循环依赖）
+ * Kafka 消费者服务
  *
  * @author whj
  */
@@ -56,7 +56,7 @@ public class KafkaConsumerService implements ConsumerSeekAware {
         try {
             for (ConsumerRecord<String, String> record : records) {
                 log.debug("【批量消费详情】Key：{}，内容：{}", record.key(), record.value());
-                List<DevicePointData> deviceDataList = JSONArray.parseArray(record.value(), DevicePointData.class);
+                List<DevicePointInfoEntity> deviceDataList = JSONArray.parseArray(record.value(), DevicePointInfoEntity.class);
                 if (deviceDataList != null && !deviceDataList.isEmpty()) {
                     batchWriteToIotDB(deviceDataList);
                 }
@@ -74,9 +74,9 @@ public class KafkaConsumerService implements ConsumerSeekAware {
     }
 
     /**
-     * 分批写入IotDB（拆分大批次，降低写入压力）
+     * 分批写入IotDB
      */
-    private void batchWriteToIotDB(List<DevicePointData> allDeviceData) {
+    private void batchWriteToIotDB(List<DevicePointInfoEntity> allDeviceData) {
         int totalSize = allDeviceData.size();
         int batchCount = (totalSize + writeBatchSize - 1) / writeBatchSize; // 向上取整计算分批次数
 
@@ -86,7 +86,7 @@ public class KafkaConsumerService implements ConsumerSeekAware {
         for (int i = 0; i < batchCount; i++) {
             int startIndex = i * writeBatchSize;
             int endIndex = Math.min((i + 1) * writeBatchSize, totalSize);
-            List<DevicePointData> batchData = allDeviceData.subList(startIndex, endIndex);
+            List<DevicePointInfoEntity> batchData = allDeviceData.subList(startIndex, endIndex);
 
             try {
                 log.debug("【写入第{}批】条数：{}", i + 1, batchData.size());

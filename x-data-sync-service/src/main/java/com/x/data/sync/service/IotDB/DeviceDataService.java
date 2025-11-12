@@ -1,5 +1,6 @@
 package com.x.data.sync.service.IotDB;
 
+import com.x.repository.service.entity.DevicePointInfoEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class DeviceDataService {
 
     // 写入数据（自动注册时间序列）
     @Transactional
-    public void writeData(DevicePointData data) {
+    public void writeData(DevicePointInfoEntity data) {
         try {
             deviceDataRepository.insertData(data);
         } catch (Exception e) {
@@ -32,7 +33,7 @@ public class DeviceDataService {
 
     // 批量写入数据
     @Transactional
-    public void writeBatchData(List<DevicePointData> dataList) {
+    public void writeBatchData(List<DevicePointInfoEntity> dataList) {
         if (dataList == null || dataList.isEmpty()) {
             return;
         }
@@ -46,12 +47,12 @@ public class DeviceDataService {
     }
 
     // 查询最新数据
-    public DevicePointData queryLatest(Long deviceId, Long pointId) {
+    public DevicePointInfoEntity queryLatest(Long deviceId, Long pointId) {
         return deviceDataRepository.queryLatestData(deviceId, pointId);
     }
 
     // 查询历史数据
-    public List<DevicePointData> queryHistory(Long deviceId, Long pointId, String startTime, String endTime) {
+    public List<DevicePointInfoEntity> queryHistory(Long deviceId, Long pointId, String startTime, String endTime) {
         return deviceDataRepository.queryHistoryData(deviceId, pointId, startTime, endTime);
     }
 }

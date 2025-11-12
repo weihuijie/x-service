@@ -91,7 +91,7 @@ public class DeviceDataRepository {
     }
 
     // 写入数据
-    public void insertData(DevicePointData data) {
+    public void insertData(DevicePointInfoEntity data) {
         // 验证参数
         if (data.getDeviceId() == null || data.getId() == null || data.getPointValue() == null) {
             throw new IllegalArgumentException("设备ID、监测点、值均不能为空");
@@ -125,13 +125,13 @@ public class DeviceDataRepository {
     }
 
     // 批量写入数据
-    public void insertBatchData(List<DevicePointData> dataList) {
+    public void insertBatchData(List<DevicePointInfoEntity> dataList) {
         if (dataList == null || dataList.isEmpty()) {
             return;
         }
 
         // 过滤掉不完整的数据
-        List<DevicePointData> validDataList = dataList.stream()
+        List<DevicePointInfoEntity> validDataList = dataList.stream()
                 .filter(data -> data.getDeviceId() != null && data.getId() != null && data.getPointValue() != null)
                 .toList();
         
@@ -153,7 +153,7 @@ public class DeviceDataRepository {
         sqlBuilder.append(devicePath);
         sqlBuilder.append("(");
         // 添加所有监测点列
-        for (DevicePointData data : validDataList) {
+        for (DevicePointInfoEntity data : validDataList) {
             String pointPath = wrapNodeName("P_", data.getId().toString());
             sqlBuilder.append(pointPath).append(", ");
         }
@@ -163,7 +163,7 @@ public class DeviceDataRepository {
 
         // 添加所有数据行
 //        long timestamp = System.currentTimeMillis();
-        for (DevicePointData data : validDataList) {
+        for (DevicePointInfoEntity data : validDataList) {
 //            timestamp = data.getTimestamp() == null ? System.currentTimeMillis() : data.getTimestamp();
             // 添加该行所有监测点的值
             Object pointValue = data.getPointValue();
@@ -190,7 +190,7 @@ public class DeviceDataRepository {
     }
 
     // 查询最新数据
-    public DevicePointData queryLatestData(Long deviceId, Long pointId) {
+    public DevicePointInfoEntity queryLatestData(Long deviceId, Long pointId) {
         // 构建查询 SQL（核心：给 LAST_VALUE 结果加别名 metric_val）
         String querySql = String.format(
                 "select " + wrapNodeName("P_",pointId.toString()) +
@@ -212,7 +212,7 @@ public class DeviceDataRepository {
     }
 
     // 查询历史数据（时间范围）
-    public List<DevicePointData> queryHistoryData(Long deviceId, Long pointId, String startTime, String endTime) {
+    public List<DevicePointInfoEntity> queryHistoryData(Long deviceId, Long pointId, String startTime, String endTime) {
         // 入参校验（避免非法参数导致 SQL 语法错误）
         if (deviceId == null || pointId == null || startTime == null || endTime == null) {
             throw new IllegalArgumentException("设备ID、指标名、开始时间、结束时间均不能为空");
