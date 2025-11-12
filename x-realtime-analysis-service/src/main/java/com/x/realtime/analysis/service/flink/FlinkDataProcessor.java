@@ -131,7 +131,7 @@ public class FlinkDataProcessor {
         @Override
         public List<DevicePointInfoEntity> map(String value) {
             try {
-                log.info("Received sensor data: {}", value);
+                log.debug("Received sensor data: {}", value);
                 // FastJSON解析JSON数组为List<DevicePointInfoEntity>（确保JSON格式正确）
                 DeviceInfoEntity deviceInfoEntity = JSONObject.parseObject(value, DeviceInfoEntity.class);
                 return deviceInfoEntity.getPointList();

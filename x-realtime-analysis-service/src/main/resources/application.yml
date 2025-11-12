@@ -6,7 +6,7 @@ spring:
 
 logging:
   level:
-    com.x.realtime.analysis.service: debug
+    com.x.realtime.analysis.service: info
     # Flink 核心包日志级别改为 DEBUG，输出算子处理细节
     #org.apache.flink.streaming.runtime.tasks: DEBUG
     #org.apache.flink.streaming.api.operators: DEBUG

@@ -20,7 +20,7 @@ spring:
 #            name: defaultCircuitBreaker
 #            fallbackUri: forward:/fallback
       routes:
-        - id: x-device-service
+        - id: x-device-access-service
           uri: lb://x-device-access-service
           predicates:
             - Path=/device/**
@@ -39,7 +39,6 @@ spring:
           uri: lb://x-auth-service
           predicates:
             - Path=/auth/**
-
         - id: x-manage-service
           uri: lb://x-manage-service
           predicates:
@@ -62,9 +61,9 @@ spring:
         # 超时配置（平衡速度与容错）
         connect-timeout: 5000                    # 网关→后端建连超时（5s）
         response-timeout: 10000                  # 等待后端响应超时（10s）
-        # 连接池配置（3000 QPS 关键：复用连接，减少建连开销）
+        # 连接池配置
         pool:
-          max-connections: 400                   # 最大连接数
+          max-connections: 500                   # 最大连接数
           max-idle-time: 300000                  # 连接最大存活时间（5分钟）
 
     # Nacos服务发现配置
@@ -117,4 +116,6 @@ management:
 logging:
   level:
     com.x.api.gateway.service: info
-    org.springframework.cloud.gateway: info
+    org.springframework.cloud.gateway: error
+    io.netty.*: error
+    reactor.netty.channel.FluxReceive: error

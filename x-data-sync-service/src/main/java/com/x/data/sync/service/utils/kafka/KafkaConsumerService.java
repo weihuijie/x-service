@@ -28,7 +28,7 @@ public class KafkaConsumerService implements ConsumerSeekAware {
     private final DeviceDataService deviceDataService;
 
     // 分批写入IotDB的最大条数（从配置文件读取）
-    @Value("${kafka.consumer.write-batch-size:500}")
+    @Value("${kafka.consumer.write-batch-size:1000}")
     private int writeBatchSize;
 
     /**

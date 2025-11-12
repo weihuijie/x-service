@@ -1,6 +1,11 @@
 server:
   port: 8085
 
+  tomcat:
+    keep-alive-timeout: 120000  # 长连接保持时间（120秒，大于网关空闲超时60秒）
+    max-keep-alive-requests: 100  # 单个长连接最大请求数（默认100，可调整）
+    connection-timeout: 60000  # 连接超时（60秒，与网关匹配）
+
 spring:
   application:
     name: x-data-collection-service
