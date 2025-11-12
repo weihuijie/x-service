@@ -1,18 +1,26 @@
 package com.x.data.sync.service.IotDB;
 
 import com.x.data.sync.service.enums.IotValueType;
-import com.x.dubbo.api.device.IDevicePointInfoDubboService;
+import com.x.dubbo.api.device.IDeviceInfoDubboService;
+import com.x.repository.service.entity.DeviceInfoEntity;
 import com.x.repository.service.entity.DevicePointInfoEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.apache.iotdb.isession.pool.SessionDataSetWrapper;
+import org.apache.iotdb.rpc.IoTDBConnectionException;
+import org.apache.iotdb.rpc.StatementExecutionException;
+import org.apache.iotdb.session.pool.SessionPool;
+import org.apache.tsfile.enums.TSDataType;
+import org.apache.tsfile.file.metadata.enums.CompressionType;
+import org.apache.tsfile.file.metadata.enums.TSEncoding;
+import org.apache.tsfile.read.common.RowRecord;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -20,22 +28,21 @@ import java.util.List;
 public class DeviceDataRepository {
     private static final String STORAGE_GROUP = "root.iot"; // IotDB 存储组（类似数据库）
 
-    // 注入 IotDB 专属 JdbcTemplate（通过名称匹配）
-    private final JdbcTemplate jdbcTemplate;
+    // 注入 IotDB SessionPool
+    private final SessionPool sessionPool;
 
     @DubboReference(version = "1.0.0")
-    private IDevicePointInfoDubboService devicePointInfoDubboService;
+    private IDeviceInfoDubboService deviceInfoDubboService;
 
-    public DeviceDataRepository(@Qualifier("iotdbJdbcTemplate") JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public DeviceDataRepository(SessionPool iotdbSessionPool) {
+        this.sessionPool = iotdbSessionPool;
     }
 
     // 创建存储组（应用启动时执行一次）
     public void createStorageGroup() {
-        String createSql = String.format("CREATE STORAGE GROUP %s", STORAGE_GROUP);
         try {
             // 直接执行创建语句
-            jdbcTemplate.execute(createSql);
+            sessionPool.createDatabase(STORAGE_GROUP);
             log.debug("IotDB 存储组 " + STORAGE_GROUP + " 创建成功！");
         } catch (Exception e) {
             if (e.getMessage().contains("root.iot")) {
@@ -48,35 +55,23 @@ public class DeviceDataRepository {
 
     // 注册时间序列
     public void createTimeSeries() {
-        List<DevicePointInfoEntity> list = devicePointInfoDubboService.list(new DevicePointInfoEntity()).getData();
+        List<DeviceInfoEntity> list = deviceInfoDubboService.listContainsPoint(null).getData();
         if (ObjectUtils.isEmpty(list)) {
             log.warn("没有找到任何设备点信息，跳过创建时间序列");
             return;
         }
-        for (DevicePointInfoEntity data : list) {
-            // 验证必要字段
-            if (data.getDeviceId() == null || data.getId() == null || data.getPointType() == null) {
-                log.warn("设备数据缺少必要字段，跳过创建时间序列: deviceId={}, id={}, pointType={}",
-                        data.getDeviceId(), data.getId(), data.getPointType());
-                return;
-            }
+        for (DeviceInfoEntity deviceInfoEntity : list) {
+            String deviceId = STORAGE_GROUP + "." + wrapNodeName("D_",deviceInfoEntity.getDeviceCode());
+            List<String> measurements = new ArrayList<>(deviceInfoEntity.getPointList().stream().map(devicePointInfoEntity -> wrapNodeName("P_", devicePointInfoEntity.getId().toString())).toList());
 
-            String tsPath = String.format(
-                    "%s.%s.%s",
-                    STORAGE_GROUP,
-                    wrapNodeName("D_",data.getDeviceId().toString()), // 设备ID是数字，无需包裹，但统一调用方法更规范
-                    wrapNodeName("P_",data.getId().toString())
-            );
-            String dataType = IotValueType.getDescByCode(data.getPointType());
-            String createSql = String.format(
-                    "create timeseries %s with datatype=%s,encoding=PLAIN",
-                    tsPath,
-                    dataType
-            );
-
+            List<TSDataType> dataTypes = new ArrayList<>(deviceInfoEntity.getPointList().stream().map(devicePointInfoEntity -> TSDataType.valueOf(IotValueType.getDescByCode(devicePointInfoEntity.getPointType()))).toList());
+            List<TSEncoding> encodings = new ArrayList<>(deviceInfoEntity.getPointList().stream().map(devicePointInfoEntity -> TSEncoding.PLAIN).toList());
+            List<CompressionType> compressions = new ArrayList<>(deviceInfoEntity.getPointList().stream().map(devicePointInfoEntity -> CompressionType.UNCOMPRESSED).toList());
+            List<String> tags = new ArrayList<>(deviceInfoEntity.getPointList().stream().map(DevicePointInfoEntity::getPointName).toList());
             try {
-                jdbcTemplate.execute(createSql);
-                log.debug("IotDB 时间序列 {} 创建成功！", tsPath);
+                // 创建时间序列
+                sessionPool.createAlignedTimeseries(deviceId, measurements, dataTypes, encodings, compressions,tags);
+                log.debug("IotDB 时间序列 {} 创建成功！", deviceId);
             } catch (Exception e) {
                 if (!e.getMessage().contains("already exist")) {
                     log.error("注册时间序列异常：",e);
@@ -91,161 +86,158 @@ public class DeviceDataRepository {
     }
 
     // 写入数据
-    public void insertData(DevicePointInfoEntity data) {
+    public void insertData(DeviceInfoEntity deviceInfoEntity) {
         // 验证参数
-        if (data.getDeviceId() == null || data.getId() == null || data.getPointValue() == null) {
-            throw new IllegalArgumentException("设备ID、监测点、值均不能为空");
+        if (ObjectUtils.isEmpty(deviceInfoEntity) || ObjectUtils.isEmpty(deviceInfoEntity.getPointList())) {
+            throw new IllegalArgumentException("设备和点位均不能为空");
         }
 
-        // 构建设备路径
-        String devicePath = String.format(
-                "%s.%s",
-                STORAGE_GROUP,
-                wrapNodeName("D_",data.getDeviceId().toString())
-        );
-        // 构建监测点路径
-        String pointPath = wrapNodeName("P_",data.getId().toString());
+        String deviceId = STORAGE_GROUP + "." + wrapNodeName("D_", deviceInfoEntity.getDeviceCode());
 
         // 时间戳和值处理
-        Long timestamp = data.getTimestamp() == null ? System.currentTimeMillis() : data.getTimestamp();
-        Object pointValue = data.getPointValue();
-        String valueStr = buildValueString(pointValue); // 简化：假设是FLOAT类型，无需判断pointType
+        long timestamp = deviceInfoEntity.getTimestamp() == null ? System.currentTimeMillis() : deviceInfoEntity.getTimestamp();
 
-        // 拼接写入SQL（路径带引号）
-        String sql = String.format(
-                "insert into %s(time, %s) values(%d, %s)",
-                devicePath, pointPath, timestamp, valueStr
-        );
+        List<String> measurements = deviceInfoEntity.getPointList().stream().map(devicePointInfoEntity -> wrapNodeName("P_", devicePointInfoEntity.getId().toString())).toList();
+
+        List<TSDataType> dataTypes = deviceInfoEntity.getPointList().stream().map(devicePointInfoEntity -> TSDataType.valueOf(IotValueType.getDescByCode(devicePointInfoEntity.getPointType()))).toList();
+        
+        List<Object> values = deviceInfoEntity.getPointList().stream().map(DevicePointInfoEntity::getPointValue).toList();
 
         try {
-            jdbcTemplate.execute(sql);
+            sessionPool.insertAlignedRecord(deviceId, timestamp, measurements,dataTypes,values);
         } catch (Exception e) {
-            throw new RuntimeException("写入时序数据失败：" + sql + "，原因：" + e.getMessage(), e);
+            throw new RuntimeException("写入时序数据失败：" + deviceId + "，原因：" + e.getMessage(), e);
         }
     }
 
     // 批量写入数据
-    public void insertBatchData(List<DevicePointInfoEntity> dataList) {
-        if (dataList == null || dataList.isEmpty()) {
+    public void insertDeviceData(List<DeviceInfoEntity> dataList) {
+        if (ObjectUtils.isEmpty(dataList)) {
             return;
         }
+        List<String> deviceIds = new ArrayList<>();
+        List<Long> timestamps = new ArrayList<>();
+        List<List<String>> measurementsList = new ArrayList<>();
+        List<List<TSDataType>> dataTypesList = new ArrayList<>();
+        List<List<Object>> valuesList = new ArrayList<>();
 
-        // 过滤掉不完整的数据
-        List<DevicePointInfoEntity> validDataList = dataList.stream()
-                .filter(data -> data.getDeviceId() != null && data.getId() != null && data.getPointValue() != null)
-                .toList();
-        
-        if (validDataList.isEmpty()) {
-            log.warn("没有有效的数据用于批量插入");
-            return;
+        for (DeviceInfoEntity deviceInfoEntity : dataList) {
+            String deviceId = STORAGE_GROUP + "." + wrapNodeName("D_", deviceInfoEntity.getDeviceCode());
+            deviceIds.add(deviceId);
+            long timestamp = deviceInfoEntity.getTimestamp() == null ? System.currentTimeMillis() : deviceInfoEntity.getTimestamp();
+            timestamps.add(timestamp);
+            List<String> measurements = deviceInfoEntity.getPointList().stream().map(devicePointInfoEntity -> wrapNodeName("P_", devicePointInfoEntity.getId().toString())).toList();
+            measurementsList.add(measurements);
+            List<TSDataType> dataTypes = deviceInfoEntity.getPointList().stream().map(devicePointInfoEntity -> TSDataType.valueOf(IotValueType.getDescByCode(devicePointInfoEntity.getPointType()))).toList();
+            dataTypesList.add(dataTypes);
+            List<Object> values = deviceInfoEntity.getPointList().stream().map(devicePointInfoEntity -> {
+                if (devicePointInfoEntity.getPointValue() instanceof BigDecimal) {
+                    return ((BigDecimal) devicePointInfoEntity.getPointValue()).floatValue();
+                }
+                return devicePointInfoEntity.getPointValue();
+            }).toList();
+            valuesList.add(values);
         }
-
-        // 构建批量插入SQL
-        StringBuilder sqlBuilder = new StringBuilder("insert into ");
-        
-        // 所有数据应该属于同一设备，取第一条有效数据的设备ID
-        Long deviceId = validDataList.get(0).getDeviceId();
-        String devicePath = String.format(
-                "%s.%s",
-                STORAGE_GROUP,
-                wrapNodeName("D_", deviceId.toString())
-        );
-        sqlBuilder.append(devicePath);
-        sqlBuilder.append("(");
-        // 添加所有监测点列
-        for (DevicePointInfoEntity data : validDataList) {
-            String pointPath = wrapNodeName("P_", data.getId().toString());
-            sqlBuilder.append(pointPath).append(", ");
-        }
-        sqlBuilder.append("time");
-        
-        sqlBuilder.append(") values (");
-
-        // 添加所有数据行
-//        long timestamp = System.currentTimeMillis();
-        for (DevicePointInfoEntity data : validDataList) {
-//            timestamp = data.getTimestamp() == null ? System.currentTimeMillis() : data.getTimestamp();
-            // 添加该行所有监测点的值
-            Object pointValue = data.getPointValue();
-            String valueStr = buildValueString(pointValue);
-            sqlBuilder.append(valueStr).append(",");
-        }
-        sqlBuilder.append(System.currentTimeMillis());
-        sqlBuilder.append(")");
-
 
         try {
-            jdbcTemplate.execute(sqlBuilder.toString());
+            sessionPool.insertAlignedRecords(deviceIds, timestamps, measurementsList,dataTypesList,valuesList);
         } catch (Exception e) {
-            log.error("批量写入时序数据失败：{}", sqlBuilder.toString(), e);
             throw new RuntimeException("批量写入时序数据失败，原因：" + e.getMessage(), e);
         }
     }
 
-    private String buildValueString(Object value) {
-        if (value == null) {
-            return "NULL";
-        }
-        return value.toString();
-    }
-
     // 查询最新数据
-    public DevicePointInfoEntity queryLatestData(Long deviceId, Long pointId) {
-        // 构建查询 SQL（核心：给 LAST_VALUE 结果加别名 metric_val）
-        String querySql = String.format(
-                "select " + wrapNodeName("P_",pointId.toString()) +
-                        " as metric_val from "+STORAGE_GROUP+".%s " +
-                        "order by time desc limit 1", // 2.0.5 用 LIMIT 1 取最新，兼容 LAST_VALUE
-                wrapNodeName("D_",deviceId.toString())
+    public DevicePointInfoEntity queryLatestData(String deviceCode, Long pointId) {
+        String deviceNode = wrapNodeName("D_", deviceCode);
+        String pointNode = wrapNodeName("P_", pointId.toString());
+        
+        String sql = String.format(
+            "SELECT %s as metric_val FROM %s.%s ORDER BY time DESC LIMIT 1",
+            pointNode,
+            STORAGE_GROUP,
+            deviceNode
         );
 
-        log.info("查询最新数据SQL：{}", querySql);
+        log.info("查询最新数据SQL：{}", sql);
 
         try {
-            // 执行查询，传入自定义 RowMapper
-            return jdbcTemplate.queryForObject(querySql,new DeviceDataRowMapper(deviceId, pointId));
-        } catch (EmptyResultDataAccessException e) {
-            throw new RuntimeException(String.format("设备 [%d] 指标 [%s] 未查询到时序数据", deviceId, pointId), e);
+            RowRecord record = executeQueryAndGetFirstRecord(sql);
+            if (record == null) {
+                throw new RuntimeException(String.format("设备 [%s] 指标 [%s] 未查询到时序数据", deviceCode, pointId));
+            }
+            
+            DevicePointInfoEntity entity = new DevicePointInfoEntity();
+            entity.setDeviceCode(deviceCode);
+            entity.setId(pointId);
+            entity.setPointValue(getValueFromRecord(record));
+            entity.setTimestamp(record.getTimestamp());
+            return entity;
         } catch (Exception e) {
-            throw new RuntimeException(String.format("查询时序数据失败：SQL=%s, 原因=%s", querySql, e.getMessage()), e);
+            throw new RuntimeException(String.format("查询时序数据失败：SQL=%s, 原因=%s", sql, e.getMessage()), e);
         }
     }
 
     // 查询历史数据（时间范围）
-    public List<DevicePointInfoEntity> queryHistoryData(Long deviceId, Long pointId, String startTime, String endTime) {
+    public List<DevicePointInfoEntity> queryHistoryData(String deviceCode, Long pointId, String startTime, String endTime) {
         // 入参校验（避免非法参数导致 SQL 语法错误）
-        if (deviceId == null || pointId == null || startTime == null || endTime == null) {
+        if (deviceCode == null || pointId == null || startTime == null || endTime == null) {
             throw new IllegalArgumentException("设备ID、指标名、开始时间、结束时间均不能为空");
         }
 
-        //处理设备路径
-        String legalDeviceNode = wrapNodeName("D_",deviceId.toString());
-        String devicePath = String.format("%s.%s", STORAGE_GROUP, legalDeviceNode); // 如：root.iot.1001
+        String deviceNode = wrapNodeName("D_", deviceCode);
+        String pointNode = wrapNodeName("P_", pointId.toString());
+        
+        long startTimestamp = LocalDateTime.parse(startTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long endTimestamp = LocalDateTime.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        //构建 SQL（无占位符、加列别名、时间范围拼接）
         String sql = String.format(
-                "SELECT " + wrapNodeName("P_",pointId.toString()) +
-                        " as metric_val FROM " + devicePath +
-                " WHERE time >= %s AND time <= %s " + // 直接拼接 Long 类型时间戳，无注入风险
-                        "ORDER BY time ASC",
-                LocalDateTime.parse(startTime,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),       // 开始时间
-                LocalDateTime.parse(endTime,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))          // 结束时间
+            "SELECT %s as metric_val FROM %s.%s WHERE time >= %d AND time <= %d ORDER BY time ASC",
+            pointNode,
+            STORAGE_GROUP,
+            deviceNode,
+            startTimestamp,
+            endTimestamp
         );
 
         log.info("查询历史数据SQL：{}", sql);
 
+        List<DevicePointInfoEntity> result = new ArrayList<>();
         try {
-            //执行查询
-            return jdbcTemplate.query(sql, new DeviceDataRowMapper(deviceId, pointId));
-        } catch (Exception e) {
-            //增强异常信息：包含完整 SQL、参数，快速定位问题
+            SessionDataSetWrapper sessionDataSetWrapper = sessionPool.executeQueryStatement(sql);
+            while (sessionDataSetWrapper.hasNext()) {
+                RowRecord record = sessionDataSetWrapper.next();
+                DevicePointInfoEntity entity = new DevicePointInfoEntity();
+                entity.setDeviceCode(deviceCode);
+                entity.setId(pointId);
+                entity.setPointValue(getValueFromRecord(record));
+                entity.setTimestamp(record.getTimestamp());
+                result.add(entity);
+            }
+            sessionDataSetWrapper.close();
+        } catch (IoTDBConnectionException | StatementExecutionException e) {
             throw new RuntimeException(
-                    String.format(
-                            "查询历史时序数据失败：deviceId=%d, pointId=%s, 时间范围=[%s, %s], SQL=%s, 原因=%s",
-                            deviceId, pointId, startTime, endTime, sql, e.getMessage()
-                    ),
-                    e
+                String.format(
+                    "查询历史时序数据失败：deviceCode=%s, pointId=%s, 时间范围=[%s, %s], SQL=%s, 原因=%s",
+                        deviceCode, pointId, startTime, endTime, sql, e.getMessage()
+                ),
+                e
             );
         }
+
+        return result;
+    }
+    
+    private RowRecord executeQueryAndGetFirstRecord(String sql) throws IoTDBConnectionException, StatementExecutionException {
+        SessionDataSetWrapper sessionDataSetWrapper = sessionPool.executeQueryStatement(sql);
+        RowRecord record = null;
+        if (sessionDataSetWrapper.hasNext()) {
+            record = sessionDataSetWrapper.next();
+        }
+        sessionDataSetWrapper.close();
+        return record;
+    }
+    
+    private Object getValueFromRecord(RowRecord record) {
+        return record.getFields().get(0).getObjectValue(TSDataType.FLOAT);
     }
 }

@@ -19,13 +19,6 @@ spring:
     listener:
       concurrency: 1 # 消费并发数（与分区数匹配，默认 1）
       missing-topics-fatal: false # 监听的主题不存在时，应用不启动失败（测试环境推荐关闭）
-  iotdb:
-    url: 127.0.0.1
-    host: 6667
-    username: root
-    password: root
-    # 增加IoTDB连接池配置
-    max-size: 50
 
   # MQTT配置
   mqtt:

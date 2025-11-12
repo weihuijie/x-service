@@ -1,19 +1,26 @@
 package com.x.device.access.service.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.x.common.base.Query;
 import com.x.common.base.R;
 import com.x.dubbo.api.device.IDeviceInfoDubboService;
+import com.x.dubbo.api.device.IDevicePointInfoDubboService;
 import com.x.repository.service.entity.DeviceInfoEntity;
+import com.x.repository.service.entity.DevicePointInfoEntity;
 import com.x.repository.service.service.IDeviceInfoService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *  服务实现类
@@ -26,11 +33,12 @@ import java.util.List;
 @DubboService(version = "1.0.0")
 public class DeviceInfoDubboServiceImpl implements IDeviceInfoDubboService {
 
-    private final IDeviceInfoService deviceInfoService;
+    @DubboReference(version = "1.0.0")
+    private IDevicePointInfoDubboService devicePointInfoDubboService;
 
-    public DeviceInfoDubboServiceImpl(IDeviceInfoService deviceInfoService) {
-        this.deviceInfoService = deviceInfoService;
-    }
+    @Autowired
+    private IDeviceInfoService deviceInfoService;
+
     /**
      * 分页
      */
@@ -81,5 +89,21 @@ public class DeviceInfoDubboServiceImpl implements IDeviceInfoDubboService {
     public R<Object> remove(@RequestParam(name = "id") Long id) {
         boolean updateResult = deviceInfoService.removeById(id) ;
         return R.status(updateResult);
+    }
+
+    @Override
+    public R<List<DeviceInfoEntity>> listContainsPoint(@RequestParam(name = "id",required = false) Long id) {
+        LambdaQueryWrapper<DeviceInfoEntity> qw = new LambdaQueryWrapper<>();
+        qw.eq(ObjectUtils.isNotEmpty(id),DeviceInfoEntity::getId,id);
+        List<DeviceInfoEntity> deviceList = deviceInfoService.list(qw);
+
+        for (DeviceInfoEntity deviceInfoEntity : deviceList) {
+            DevicePointInfoEntity devicePointInfoEntity = new DevicePointInfoEntity();
+            devicePointInfoEntity.setDeviceId(deviceInfoEntity.getId());
+            List<DevicePointInfoEntity> pointList = devicePointInfoDubboService.list(devicePointInfoEntity).getData();
+            deviceInfoEntity.setPointList(pointList);
+        }
+        List<DeviceInfoEntity> filter = deviceList.stream().filter(e -> ObjectUtils.isNotEmpty(e.getPointList())).collect(Collectors.toList());
+        return R.data( filter);
     }
 }

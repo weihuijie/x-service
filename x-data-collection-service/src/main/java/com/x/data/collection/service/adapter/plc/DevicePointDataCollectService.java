@@ -67,9 +67,9 @@ public class DevicePointDataCollectService {
                 deviceCollectPoint.setTimestamp(timestamp);
                 sendData.add(deviceCollectPoint);
             }
+            deviceInfoEntity.setPointList(deviceCollectPoints);
             log.info("设备：{}，点位信息：{}", deviceInfoEntity.getDeviceName(), deviceCollectPoints);
-            kafkaProducerService.sendMessageAsync(deviceInfoEntity.getDeviceCode(), JSONObject.toJSONString(sendData));
-
+            kafkaProducerService.sendMessageAsync(deviceInfoEntity.getDeviceCode(), JSONObject.toJSONString(deviceInfoEntity));
         }
     }
 

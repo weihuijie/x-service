@@ -1,5 +1,6 @@
 package com.x.data.sync.service.IotDB;
 
+import com.x.repository.service.entity.DeviceInfoEntity;
 import com.x.repository.service.entity.DevicePointInfoEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,39 +21,28 @@ public class DeviceDataService {
         deviceDataRepository.createTimeSeries();
     }
 
-    // 写入数据（自动注册时间序列）
-    @Transactional
-    public void writeData(DevicePointInfoEntity data) {
-        try {
-            deviceDataRepository.insertData(data);
-        } catch (Exception e) {
-            log.error("写入单条数据失败: {}", e.getMessage(), e);
-            throw e;
-        }
-    }
-
     // 批量写入数据
     @Transactional
-    public void writeBatchData(List<DevicePointInfoEntity> dataList) {
+    public void writeDeviceData(List<DeviceInfoEntity> dataList) {
         if (dataList == null || dataList.isEmpty()) {
             return;
         }
         try {
             // 批量插入数据
-            deviceDataRepository.insertBatchData(dataList);
+            deviceDataRepository.insertDeviceData(dataList);
         } catch (Exception e) {
-            log.error("批量写入数据失败，数据条数: {}，错误: {}", dataList.size(), e.getMessage(), e);
+            log.error("写入数据失败，数据条数: {}，错误: {}", dataList.size(), e.getMessage(), e);
             throw e;
         }
     }
 
     // 查询最新数据
-    public DevicePointInfoEntity queryLatest(Long deviceId, Long pointId) {
-        return deviceDataRepository.queryLatestData(deviceId, pointId);
+    public DevicePointInfoEntity queryLatest(String deviceCode, Long pointId) {
+        return deviceDataRepository.queryLatestData(deviceCode, pointId);
     }
 
     // 查询历史数据
-    public List<DevicePointInfoEntity> queryHistory(Long deviceId, Long pointId, String startTime, String endTime) {
-        return deviceDataRepository.queryHistoryData(deviceId, pointId, startTime, endTime);
+    public List<DevicePointInfoEntity> queryHistory(String deviceCode, Long pointId, String startTime, String endTime) {
+        return deviceDataRepository.queryHistoryData(deviceCode, pointId, startTime, endTime);
     }
 }

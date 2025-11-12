@@ -1,8 +1,9 @@
 package com.x.realtime.analysis.service.flink;
 
-import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.x.realtime.analysis.service.rabbitmq.CustomRabbitMQSink;
 import com.x.realtime.analysis.service.rabbitmq.RabbitMQConfigProperties;
+import com.x.repository.service.entity.DeviceInfoEntity;
 import com.x.repository.service.entity.DevicePointInfoEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -58,11 +59,11 @@ public class FlinkDataProcessor {
 
             // Kafka消费者配置
             KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
-                    .setBootstrapServers("192.168.126.1:9092")
+                    .setBootstrapServers("127.0.0.1:9092")
                     .setTopics("test-topic")
                     .setGroupId("data-realtime-group")
-                    .setClientIdPrefix("data-collection-consumer-analysis-")
-                    .setStartingOffsets(OffsetsInitializer.earliest())
+                    .setClientIdPrefix("data-collection-consumer-analysis")
+                    .setStartingOffsets(OffsetsInitializer.latest())
                     .setValueOnlyDeserializer(new SimpleStringSchema())
                     // 新增：配置 Kafka 消费者参数，解决重平衡问题
                     .setProperty("max.poll.interval.ms", "600000") // 10 分钟（单位：ms）
@@ -132,7 +133,8 @@ public class FlinkDataProcessor {
             try {
                 log.info("Received sensor data: {}", value);
                 // FastJSON解析JSON数组为List<DevicePointInfoEntity>（确保JSON格式正确）
-                return JSONArray.parseArray(value, DevicePointInfoEntity.class);
+                DeviceInfoEntity deviceInfoEntity = JSONObject.parseObject(value, DeviceInfoEntity.class);
+                return deviceInfoEntity.getPointList();
             } catch (Exception e) {
                 log.error("Failed to parse sensor data: {}", value, e); // 用log记录错误，便于排查
                 return null;

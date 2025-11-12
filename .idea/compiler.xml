@@ -10,9 +10,9 @@
         <module name="x-offline-analysis-service" />
         <module name="x-task-scheduler-service" />
         <module name="x-config-center-service" />
-        <module name="x-common" />
         <module name="x-auth-service" />
         <module name="x-realtime-analysis-service" />
+        <module name="x-common" />
         <module name="x-manage-service" />
         <module name="x-dubbo-api" />
         <module name="x-repository-service" />

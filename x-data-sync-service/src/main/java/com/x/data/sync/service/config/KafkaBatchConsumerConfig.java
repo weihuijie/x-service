@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Kafka 批量消费配置类（独立配置，避免循环依赖）
+ * Kafka 批量消费配置类
  */
 @Configuration
 public class KafkaBatchConsumerConfig {

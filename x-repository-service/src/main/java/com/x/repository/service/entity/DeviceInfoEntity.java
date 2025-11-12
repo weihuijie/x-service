@@ -1,6 +1,7 @@
 package com.x.repository.service.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.x.repository.service.base.BaseEntity;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
+import java.util.List;
 
 /**
  * 设备表
@@ -31,4 +33,10 @@ public class DeviceInfoEntity extends BaseEntity {
     private String deviceCode;
 
     private String plcCode;
+
+    @TableField(exist = false)
+    private Long timestamp;
+
+    @TableField(exist = false)
+    private List<DevicePointInfoEntity> pointList;
 }

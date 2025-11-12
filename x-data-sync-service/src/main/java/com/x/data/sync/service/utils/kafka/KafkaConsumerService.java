@@ -1,8 +1,8 @@
 package com.x.data.sync.service.utils.kafka;
 
-import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.x.data.sync.service.IotDB.DeviceDataService;
-import com.x.repository.service.entity.DevicePointInfoEntity;
+import com.x.repository.service.entity.DeviceInfoEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -54,13 +54,13 @@ public class KafkaConsumerService implements ConsumerSeekAware {
                 .collect(Collectors.toList());
 
         try {
-            for (ConsumerRecord<String, String> record : records) {
-                log.debug("【批量消费详情】Key：{}，内容：{}", record.key(), record.value());
-                List<DevicePointInfoEntity> deviceDataList = JSONArray.parseArray(record.value(), DevicePointInfoEntity.class);
-                if (deviceDataList != null && !deviceDataList.isEmpty()) {
-                    batchWriteToIotDB(deviceDataList);
-                }
-            }
+            log.debug("【批量消费详情】size：{}",records.size());
+            List<DeviceInfoEntity> allDeviceData = records
+                    .stream()
+                    .map(record -> JSONObject.parseObject(record.value(), DeviceInfoEntity.class))
+                    .toList();
+
+            writeToIotDB(allDeviceData);
             // 所有数据处理成功，提交偏移量（原子提交）
             acknowledgment.acknowledge();
             log.info("【批量消费成功】耗时：{}ms", System.currentTimeMillis() - startTime);
@@ -76,7 +76,7 @@ public class KafkaConsumerService implements ConsumerSeekAware {
     /**
      * 分批写入IotDB
      */
-    private void batchWriteToIotDB(List<DevicePointInfoEntity> allDeviceData) {
+    private void writeToIotDB(List<DeviceInfoEntity> allDeviceData) {
         int totalSize = allDeviceData.size();
         int batchCount = (totalSize + writeBatchSize - 1) / writeBatchSize; // 向上取整计算分批次数
 
@@ -86,11 +86,11 @@ public class KafkaConsumerService implements ConsumerSeekAware {
         for (int i = 0; i < batchCount; i++) {
             int startIndex = i * writeBatchSize;
             int endIndex = Math.min((i + 1) * writeBatchSize, totalSize);
-            List<DevicePointInfoEntity> batchData = allDeviceData.subList(startIndex, endIndex);
+            List<DeviceInfoEntity> batchData = allDeviceData.subList(startIndex, endIndex);
 
             try {
                 log.debug("【写入第{}批】条数：{}", i + 1, batchData.size());
-                deviceDataService.writeBatchData(batchData);
+                deviceDataService.writeDeviceData(batchData);
             } catch (Exception e) {
                 log.error("【第{}批写入失败】条数：{}", i + 1, batchData.size(), e);
                 throw new RuntimeException("分批写入IotDB失败", e); // 触发整体重试

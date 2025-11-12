@@ -16,7 +16,7 @@
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-common</artifactId>
-            <version>1.0.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- MyBatis Plus依赖 -->

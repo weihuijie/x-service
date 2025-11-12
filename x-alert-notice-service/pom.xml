@@ -18,17 +18,17 @@
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-common</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-dubbo-api</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-repository-service</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Spring Boot Web依赖 -->
@@ -64,5 +64,32 @@
             <artifactId>dubbo-spring-boot-starter</artifactId>
         </dependency>
     </dependencies>
+
+    <!-- 核心：配置打包插件-->
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- repackage：将普通JAR重新打包为Spring Boot可执行JAR -->
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
