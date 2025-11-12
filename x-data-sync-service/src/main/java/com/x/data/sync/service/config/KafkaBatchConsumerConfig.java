@@ -25,7 +25,7 @@ public class KafkaBatchConsumerConfig {
     private String groupId;
 
     // 批量消费核心配置
-    @Value("${kafka.consumer.batch-size:100}")
+    @Value("${kafka.consumer.batch-size:1024}")
     private int batchSize;
     @Value("${kafka.consumer.fetch-min-size:10240}")
     private int fetchMinSize;

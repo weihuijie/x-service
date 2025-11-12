@@ -32,11 +32,15 @@ public class IoTDBSessionPoolConfig {
      */
     @Bean("iotdbSessionPool")
     public SessionPool iotdbSessionPool() {
+
         return new SessionPool.Builder()
+                // 基础连接配置
                 .nodeUrls(nodeUrls)
                 .user(username)
                 .password(password)
-                .maxSize(3)
+                // 连接池大小配置
+                .maxSize(50)
+                .fetchSize(10000)
                 .build();
     }
 }
