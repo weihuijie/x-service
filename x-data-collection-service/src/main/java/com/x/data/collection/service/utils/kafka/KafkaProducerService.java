@@ -27,7 +27,7 @@ public class KafkaProducerService {
     }
 
     /**
-     * 异步发送消息（带回调，推荐生产环境使用）
+     * 异步发送消息
      * @param key 消息 Key
      * @param message 消息内容
      */

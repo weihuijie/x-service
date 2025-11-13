@@ -1,6 +1,7 @@
 package com.x.data.collection.service.adapter.http;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONWriter;
 import com.x.common.base.R;
 import com.x.data.collection.service.adapter.validation.DeviceDataValidator;
 import com.x.data.collection.service.adapter.validation.ValidationResult;
@@ -32,6 +33,12 @@ public class DeviceDataHttpAdapter {
     @Autowired
     private DeviceDataValidator deviceDataValidator;
 
+    // Fastjson2序列化配置（静态复用，避免重复创建）
+    private static final JSONWriter.Feature[] SERIALIZE_FEATURES = {
+            JSONWriter.Feature.WriteNulls, // 保留null字段（根据业务可选）
+            JSONWriter.Feature.IgnoreNonFieldGetter, // 忽略非字段getter
+    };
+
     /**
      * 接收设备推送的点位数据
      * 支持单个设备数据推送
@@ -55,7 +62,7 @@ public class DeviceDataHttpAdapter {
         CompletableFuture.runAsync(() -> {
             try {
                 // 将数据发送到Kafka
-                kafkaProducerService.sendMessageAsync(deviceCode, JSONObject.toJSONString(data));
+                kafkaProducerService.sendMessageAsync(deviceCode, JSONObject.toJSONString(data,SERIALIZE_FEATURES));
                 log.debug("设备数据已接收并发送到Kafka: deviceCode={}, data={}", deviceCode, data);
             } catch (Exception e) {
                 log.error("处理设备数据时发生错误: deviceCode={}", deviceCode, e);
