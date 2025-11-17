@@ -29,6 +29,7 @@
         <module>x-alert-notice-service</module>
         <module>x-task-scheduler-service</module>
         <module>x-file-service</module>
+        <module>x-tcp-gateway-service</module>
     </modules>
 
     <properties><!-- 配置，一般为版本管理 -->

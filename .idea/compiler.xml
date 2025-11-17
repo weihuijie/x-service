@@ -22,11 +22,13 @@
         <module name="x-data-collection-service" />
         <module name="x-data-sync-service" />
         <module name="x-api-gateway-service" />
+        <module name="x-tcp-gateway-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="x-demo-service" target="17" />
       <module name="x-dubbo-grpc" target="17" />
+      <module name="x-tcp-parse-service" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

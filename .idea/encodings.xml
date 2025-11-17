@@ -33,5 +33,9 @@
     <file url="file://$PROJECT_DIR$/x-repository-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-task-scheduler-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-task-scheduler-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-tcp-gateway-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-tcp-gateway-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-tcp-parse-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-tcp-parse-service/src/main/resources" charset="UTF-8" />
   </component>
 </project>

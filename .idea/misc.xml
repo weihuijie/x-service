@@ -20,6 +20,7 @@
       <set>
         <option value="$PROJECT_DIR$/x-ai-service/pom.xml" />
         <option value="$PROJECT_DIR$/x-demo-service/pom.xml" />
+        <option value="$PROJECT_DIR$/x-tcp-parse-service/pom.xml" />
       </set>
     </option>
   </component>
