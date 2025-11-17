@@ -22,7 +22,7 @@
         <module name="x-data-collection-service" />
         <module name="x-data-sync-service" />
         <module name="x-api-gateway-service" />
-        <module name="x-tcp-gateway-service" />
+        <module name="x-data-collection-tcp-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

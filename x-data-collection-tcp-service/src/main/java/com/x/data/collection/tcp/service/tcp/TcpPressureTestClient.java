@@ -1,12 +1,11 @@
-package com.x.tcp.gateway.service.tcp;
+package com.x.data.collection.tcp.service.tcp;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.json.JsonObjectDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import org.slf4j.Logger;
@@ -20,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TcpPressureTestClient {
     private static final String SERVER_HOST = "127.0.0.1"; // 服务端IP
-    private static final int SERVER_PORT = 9000; // 服务端端口
+    private static final int SERVER_PORT = 9001; // 服务端端口
     private static final int CLIENT_THREADS = 10; // 压测客户端线程数
     private static final int CONNECTIONS_PER_THREAD = 50; // 每个线程的连接数（总连接数=10*50=500）
     private static final int REQUESTS_PER_SECOND = 5000; // 目标QPS
@@ -46,8 +45,9 @@ public class TcpPressureTestClient {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 0, 4, 0, 4));
-                            pipeline.addLast(new LengthFieldPrepender(4));
+//                            pipeline.addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 0, 4, 0, 4));
+//                            pipeline.addLast(new LengthFieldPrepender(4));
+                            pipeline.addLast(new JsonObjectDecoder(10240)); // 10KB 最大帧
                             pipeline.addLast(new StringDecoder(StandardCharsets.UTF_8));
                             pipeline.addLast(new StringEncoder(StandardCharsets.UTF_8));
                             pipeline.addLast(new ClientHandler());
@@ -66,7 +66,7 @@ public class TcpPressureTestClient {
 
                             // 每个连接循环发送请求（控制QPS）
                             while (true) {
-                                String request = "test_qps_" + System.currentTimeMillis();
+                                String request = "{\"id\":1,\"deviceName\":\"电铲1号\",\"deviceCode\":\"shovel001\"}";
                                 channel.writeAndFlush(request);
                                 TOTAL_SENT.incrementAndGet();
 
@@ -95,6 +95,7 @@ public class TcpPressureTestClient {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
             // 接收服务端响应，计数+1
+            LOGGER.info("接收服务端响应：{}", msg);
             TOTAL_RECEIVED.incrementAndGet();
         }
 

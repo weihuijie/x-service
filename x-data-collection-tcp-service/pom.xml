@@ -9,7 +9,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>x-tcp-gateway-service</artifactId>
+    <artifactId>x-data-collection-tcp-service</artifactId>
     <description>TCP网关服务</description>
 
     <dependencies>
@@ -17,6 +17,19 @@
             <groupId>com.x</groupId>
             <artifactId>x-common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.x</groupId>
+            <artifactId>x-repository-service</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <!-- 排除 JDBC starter，核心是阻止 DataSourceAutoConfiguration 触发 -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-jdbc</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Spring Boot Web依赖 -->
@@ -41,6 +54,18 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- kafka -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+        </dependency>
+
+        <!-- Spring Kafka 核心依赖（自动整合 Kafka 客户端） -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
     </dependencies>
 
