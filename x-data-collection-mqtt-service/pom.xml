@@ -9,26 +9,27 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>x-alert-notice-service</artifactId>
-    <description>告警通知服务</description>
+    <artifactId>x-data-collection-mqtt-service</artifactId>
+    <description>MQTT数据采集服务</description>
 
     <dependencies>
-
-        <!-- 模块依赖 -->
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.x</groupId>
-            <artifactId>x-dubbo-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.x</groupId>
             <artifactId>x-repository-service</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <!-- 排除 JDBC starter，核心是阻止 DataSourceAutoConfiguration 触发 -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-jdbc</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Spring Boot Web依赖 -->
@@ -37,28 +38,38 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- RabbitMQ消息队列 -->
+        <!-- MQTT客户端 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <version>1.2.5</version>
         </dependency>
 
         <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
-        <!-- dubbo-->
+
+        <!-- Nacos服务发现 -->
         <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-registry-nacos</artifactId>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+
+        <!-- kafka -->
         <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-spring-boot-starter</artifactId>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+        </dependency>
+
+        <!-- Spring Kafka 核心依赖（自动整合 Kafka 客户端） -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
     </dependencies>
 
-    <!-- 核心：配置打包插件-->
     <build>
         <resources>
             <resource>
@@ -76,7 +87,6 @@
                 <executions>
                     <execution>
                         <goals>
-                            <!-- repackage：将普通JAR重新打包为Spring Boot可执行JAR -->
                             <goal>repackage</goal>
                         </goals>
                     </execution>
@@ -84,5 +94,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -13,6 +13,8 @@
     <file url="file://$PROJECT_DIR$/x-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-config-center-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-config-center-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-data-collection-mqtt-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-data-collection-mqtt-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-data-collection-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-data-collection-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-data-collection-tcp-service/src/main/java" charset="UTF-8" />
