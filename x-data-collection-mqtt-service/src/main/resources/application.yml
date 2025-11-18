@@ -28,12 +28,13 @@ spring:
 logging:
   level:
     com.x: info
+    org.apache: info
 
 
 # MQTT 服务自定义配置
 mqtt:
   broker:
-    url: tcp://localhost:1883
+    url: tcp://localhost:2883
     username: admin
     password: public
     client-id: mqtt-data-collector-client

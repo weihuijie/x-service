@@ -44,6 +44,12 @@ public class MqttClientService {
                 @Override
                 public void connectionLost(Throwable cause) {
                     log.error("MQTT连接断开", cause);
+                    try {
+                        Thread.sleep(1000L);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    connect();
                 }
 
                 @Override
@@ -92,6 +98,12 @@ public class MqttClientService {
             log.info("MQTT客户端连接成功！服务器地址：{}，订阅主题：{}", mqttProperties.getUrl(), mqttProperties.getDefaultTopic());
         } catch (MqttException e) {
             log.error("MQTT客户端连接失败", e);
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            connect();
         }
     }
 
