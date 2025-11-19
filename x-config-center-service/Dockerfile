@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/x-config-center-service.jar app.jar
 
 # 暴露端口
-EXPOSE 8082
+EXPOSE 8000
 
 # 运行应用程序
 ENTRYPOINT ["java", "-jar", "app.jar"]

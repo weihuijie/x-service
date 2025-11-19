@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/x-auth-service.jar app.jar
 
 # 暴露端口
-EXPOSE 8087
+EXPOSE 8100
 
 # 运行应用程序
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,5 +1,5 @@
 server:
-  port: 19001
+  port: 19101
 
 spring:
   application:
@@ -33,7 +33,7 @@ logging:
 # TCP 服务自定义配置（可覆盖 TcpServerProperties 中的默认值）
 tcp:
   server:
-    port: 9001 # 监听端口
+    port: 9101 # 监听端口
     worker-threads: 8 # 工作线程数（根据 CPU 核心调整）
     read-idle-seconds: 300 # 空闲连接超时（5分钟）
     buffer-size: 32768 # 缓冲区大小

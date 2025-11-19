@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/x-realtime-analysis-service.jar app.jar
 
 # 暴露端口
-EXPOSE 8088
+EXPOSE 8040
 
 # 运行应用程序
 ENTRYPOINT ["java", "-jar", "app.jar"]

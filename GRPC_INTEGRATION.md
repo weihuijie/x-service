@@ -15,17 +15,7 @@
 ## 2. 项目结构
 
 ```
-x-service/
-├── x-grpc-common/           # gRPC公共模块
-│   ├── src/main/proto/      # .proto定义文件
-│   │   ├── device_service.proto
-│   │   ├── auth_service.proto
-│   │   └── data_service.proto
-│   └── src/main/java/       # 生成的Java代码和配置
-├── x-device-manage-service/ # 设备管理服务(gRPC服务端)
-├── x-auth-service/          # 认证服务(gRPC服务端)
-├── x-data-collection-service/ # 数据处理服务(gRPC服务端)
-└── x-manage-service/        # 管理服务(gRPC客户端)
+
 ```
 
 ## 3. gRPC服务实现
