@@ -46,7 +46,7 @@
 - 插入文档（单个和多个）
 - 查询文档（条件查询和全量查询）
 - 更新文档（单个和多个）
-- 删除文档（单个和多个）
+- 删除文档（单个和多个)
 
 ### 2.5 MinIO 组件工具类
 **类名**: [MinIOComponentUtil](file:///D:/work/project/me/x-service/x-common/src/main/java/com/x/common/component/MinIOComponentUtil.java)
