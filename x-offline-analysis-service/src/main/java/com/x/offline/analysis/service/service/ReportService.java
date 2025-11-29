@@ -18,6 +18,12 @@ import java.time.format.DateTimeFormatter;
 
 import static org.apache.spark.sql.functions.*;
 
+/**
+ *
+ *  核心服务
+ *
+ * @author whj
+ */
 @Slf4j
 @Service
 public class ReportService {

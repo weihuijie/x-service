@@ -24,6 +24,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * HDFS 工具类
+ *
+ * @author whj
+ */
 @Component
 @Slf4j
 public class HdfsUtil {

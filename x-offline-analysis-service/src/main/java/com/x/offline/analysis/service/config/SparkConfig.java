@@ -8,7 +8,11 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-// Spark 配置类
+/**
+ * Spark 配置类
+ *
+ * @author whj
+ */
 @Component
 @EnableAutoConfiguration
 @ConfigurationProperties(prefix = "spark")

@@ -6,7 +6,11 @@ import com.x.offline.analysis.service.config.SparkConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.stereotype.Component;
-
+/**
+ * SPARK 工具类
+ *
+ * @author whj
+ */
 @Component
 @Slf4j
 public class SparkUtil {

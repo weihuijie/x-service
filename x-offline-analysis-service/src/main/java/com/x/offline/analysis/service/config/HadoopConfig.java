@@ -8,7 +8,11 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-// Hadoop 配置类
+/**
+ * Hadoop 配置类
+ *
+ * @author whj
+ */
 @Component
 @EnableAutoConfiguration
 @ConfigurationProperties(prefix = "hadoop")
