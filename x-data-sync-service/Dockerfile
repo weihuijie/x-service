@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/x-data-sync-service.jar app.jar
 
 # 暴露端口
-EXPOSE 8086
+EXPOSE 8030
 
 # 运行应用程序
 ENTRYPOINT ["java", "-jar", "app.jar"]

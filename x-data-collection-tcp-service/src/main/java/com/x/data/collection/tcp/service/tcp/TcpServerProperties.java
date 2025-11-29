@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class TcpServerProperties {
     // 默认配置（可在 application.yml 中覆盖）
     private String host = "0.0.0.0";
-    private int port = 9001;
+    private int port = 9101;
     private int bossThreads = 1;
     private int workerThreads = Runtime.getRuntime().availableProcessors() * 2;
     private int backlog = 10240;

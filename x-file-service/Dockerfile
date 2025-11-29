@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/x-file-service.jar app.jar
 
 # 暴露端口
-EXPOSE 8092
+EXPOSE 8090
 
 # 运行应用程序
 ENTRYPOINT ["java", "-jar", "app.jar"]

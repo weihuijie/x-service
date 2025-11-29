@@ -24,7 +24,6 @@
 - Spring Cloud LoadBalancer
 - Resilience4j (熔断器)
 - Spring Data Redis Reactive (限流)
-- Spring Cloud OpenFeign (服务间调用)
 - Spring Boot Actuator (监控)
 - SpringDoc OpenAPI (API文档)
 

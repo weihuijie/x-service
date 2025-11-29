@@ -1,5 +1,5 @@
 server:
-  port: 9000
+  port: 9100
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/plain,text/css,application/javascript

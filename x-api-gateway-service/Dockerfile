@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/x-api-gateway-service-1.0.0.jar app.jar
 
 # 暴露端口
-EXPOSE 9000
+EXPOSE 9100
 
 # 运行应用程序
 ENTRYPOINT ["java", "-jar", "app.jar"]

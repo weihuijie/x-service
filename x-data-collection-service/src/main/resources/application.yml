@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: 8020
 
   tomcat:
     keep-alive-timeout: 120000  # 长连接保持时间（120秒，大于网关空闲超时60秒）

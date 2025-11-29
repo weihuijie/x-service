@@ -1,4 +1,4 @@
-# MQTT Data Collection Service
+# MQTT数据采集服务
 
 MQTT数据采集服务，负责处理MQTT协议设备的接入和数据转发。
 

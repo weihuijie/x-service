@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/x-task-scheduler-service.jar app.jar
 
 # 暴露端口
-EXPOSE 8091
+EXPOSE 8070
 
 # 运行应用程序
 ENTRYPOINT ["java", "-jar", "app.jar"]
