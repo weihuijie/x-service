@@ -82,12 +82,12 @@
         <rabbitmq.version>5.18.0</rabbitmq.version>
 
         <!-- 大数据处理版本 -->
-        <hadoop.version>3.3.4</hadoop.version>
+        <hadoop.version>3.4.0</hadoop.version>
         <flink.version>1.17.2</flink.version>
 
         <!-- 其他服务版本 -->
         <xxl-job.version>3.2.0</xxl-job.version>
-        <minio.version>8.5.1</minio.version>
+        <minio.version>8.6.0</minio.version>
 
         <!-- 监控和日志相关版本 -->
         <micrometer.version>1.11.0</micrometer.version>
@@ -290,6 +290,28 @@
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-client</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${hadoop.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-client</artifactId>
                 <version>${hadoop.version}</version>
             </dependency>
 
