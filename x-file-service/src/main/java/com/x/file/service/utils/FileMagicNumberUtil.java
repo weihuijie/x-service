@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 文件魔数（Magic Number）工具类，用于判断文件真实MIME类型（修复重复Key问题）
+ * 文件魔数（Magic Number）工具类，用于判断文件真实MIME类型
  */
 public class FileMagicNumberUtil {
     // 唯一魔数映射（key：魔数字节数组（十六进制字符串），value：基础MIME类型）
@@ -65,16 +65,16 @@ public class FileMagicNumberUtil {
      * 根据文件流+原始文件名，获取真实MIME类型（魔数优先，扩展名兜底）
      */
     public static String getRealContentType(InputStream inputStream, String originalFilename) throws IOException {
-        // 步骤1：读取前8个字节魔数（覆盖绝大多数文件的魔数长度）
+        // 读取前8个字节魔数（覆盖绝大多数文件的魔数长度）
         String magicHex = readMagicNumberHex(inputStream, 8);
         if (ObjectUtils.isEmpty(magicHex)) {
             return getFallbackContentType(originalFilename);
         }
 
-        // 步骤2：匹配魔数，得到基础类型
+        // 匹配魔数，得到基础类型
         String baseContentType = matchMagicNumber(magicHex);
 
-        // 步骤3：同一魔数对应多种类型时，结合扩展名二次区分
+        // 同一魔数对应多种类型时，结合扩展名二次区分
         if ("application/zip".equals(baseContentType)) {
             // ZIP压缩包：根据扩展名区分 docx/xlsx/pptx
             return getOfficeZipContentType(originalFilename);
@@ -86,7 +86,7 @@ public class FileMagicNumberUtil {
             return baseContentType;
         }
 
-        // 步骤4：未匹配到魔数，按扩展名兜底
+        // 未匹配到魔数，按扩展名兜底
         return getFallbackContentType(originalFilename);
     }
 

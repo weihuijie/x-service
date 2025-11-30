@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * 文件存储服务类（适配 MinIO 8.6.0 + 完善分片上传 + 高并发优化）
+ * 文件存储服务类
  *
  * @author whj
  */
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class FileStorageService {
 
     // ==================== 常量定义（避免硬编码）====================
-    /** 默认预签名URL有效期（30分钟，兼顾安全与使用体验） */
+    /** 默认预签名URL有效期（30分钟） */
     private static final int DEFAULT_URL_EXPIRY_SECONDS = 30 * 60;
     /** 分片大小（5MB，MinIO最小分片1MB，建议5-10MB） */
     private static final long CHUNK_SIZE = 5 * 1024 * 1024;
@@ -72,7 +72,7 @@ public class FileStorageService {
     @Value("${minio.bucket-name:test}")
     private String bucketName;
 
-    // ==================== 构造方法（补充 StringRedisTemplate 注入）====================
+    // ==================== 构造方法====================
     @Autowired
     public FileStorageService(MinioClient minioClient,
                               DistributedLockService distributedLockService,
@@ -109,7 +109,7 @@ public class FileStorageService {
         }
     }
 
-    // ==================== 核心方法（优化后）====================
+    // ==================== 核心方法 ====================
 
     /**
      * 单文件异步上传（支持防重复、MD5校验，优化流处理）
@@ -124,16 +124,16 @@ public class FileStorageService {
             Assert.hasText(originalFilename, "文件名不能为空");
 
             try (InputStream fileInputStream = file.getInputStream()) {
-                // 1. 计算文件MD5（用于重复上传判断）
+                // 计算文件MD5（用于重复上传判断）
                 String fileMd5 = DigestUtils.md5DigestAsHex(fileInputStream);
 
-                // 2. 重新获取上传流
+                // 重新获取上传流
                 try (InputStream uploadInputStream = file.getInputStream()) {
-                    // 3. 处理文件名（安全化+防覆盖）
+                    // 处理文件名（安全化+防覆盖）
                     String safeOriginalName = processSafeFilename(originalFilename);
                     String storageFileName = UUID.randomUUID().toString().replace("-", "") + "_" + safeOriginalName;
 
-                    // 4. 分布式锁：优化重试策略（重试2次，间隔100ms）
+                    // 分布式锁（重试2次，间隔100ms）
                     String lockKey = LOCK_PREFIX + fileMd5;
                     String requestId = UUID.randomUUID().toString() + ":" + Thread.currentThread().getId();
                     boolean lockAcquired = distributedLockService.tryLock(lockKey, requestId, 30, 2, 100);
@@ -152,7 +152,7 @@ public class FileStorageService {
                             throw new RuntimeException("文件正在上传中，请勿重复提交");
                         }
 
-                        // 5. 检查是否已存在相同文件（防重复上传）
+                        // 检查是否已存在相同文件（防重复上传）
                         String existingStorageFileName = getStorageFileNameByMd5(fileMd5);
                         if (StringUtils.containsWhitespace(existingStorageFileName)) {
                             log.info("文件内容已存在，复用文件：originalFilename={}, storageFileName={}",
@@ -161,9 +161,9 @@ public class FileStorageService {
                             return buildResultMap(originalFilename, existingStorageFileName, fileUrl, fileMd5);
                         }
 
-                        // 6. 上传文件（带原始文件名元数据）
+                        // 上传文件（带原始文件名元数据）
                         String realContentType = FileMagicNumberUtil.getRealContentType(uploadInputStream, originalFilename);
-                        // 兜底：如果真实类型未匹配到，用客户端传递的类型（或默认类型）
+                        // 如果真实类型未匹配到，用客户端传递的类型（或默认类型）
                         if (StringUtils.isEmpty(realContentType)) {
                             realContentType = file.getContentType() != null ? file.getContentType() : "application/octet-stream";
                         }
@@ -177,13 +177,13 @@ public class FileStorageService {
                                         .build()
                         );
 
-                        // 7. 存储MD5-文件名映射
+                        // 存储MD5-文件名映射
                         saveMd5StorageNameMapping(fileMd5, storageFileName);
 
                         log.info("文件上传成功：originalFilename={}, storageFileName={}, md5={}, size={}KB",
                                 originalFilename, storageFileName, fileMd5, file.getSize() / 1024);
 
-                        // 8. 返回结果
+                        // 返回结果
                         String fileUrl = getFileUrl(storageFileName, DEFAULT_URL_EXPIRY_SECONDS);
                         return buildResultMap(originalFilename, storageFileName, fileUrl, fileMd5);
                     } finally {
@@ -200,7 +200,7 @@ public class FileStorageService {
     }
 
     /**
-     * 构建返回结果Map（统一格式）
+     * 构建返回结果Map
      */
     private Map<String, String> buildResultMap(String originalFilename, String storageFileName, String fileUrl, String fileMd5) {
         Map<String, String> result = new HashMap<>();
@@ -237,12 +237,12 @@ public class FileStorageService {
             Assert.hasText(storageFileName, "存储文件名不能为空");
 
             try {
-                // 1. 检查文件是否存在
+                // 检查文件是否存在
                 if (!checkFileExists(storageFileName)) {
                     throw new RuntimeException("文件不存在：" + storageFileName);
                 }
 
-                // 2. 获取文件元数据（原始文件名、大小、Content-Type）
+                // 获取文件元数据（原始文件名、大小、Content-Type）
                 StatObjectResponse statResponse = minioClient.statObject(
                         StatObjectArgs.builder()
                                 .bucket(bucketName)
@@ -256,7 +256,7 @@ public class FileStorageService {
                 String contentType = statResponse.contentType(); // MinIO 存储的真实 Content-Type
                 long contentLength = statResponse.size(); // 文件大小（字节）
 
-                // 3. 获取文件流（MinIO 的 GetObjectResponse）
+                // 获取文件流（MinIO 的 GetObjectResponse）
                 GetObjectResponse response = minioClient.getObject(
                         GetObjectArgs.builder()
                                 .bucket(bucketName)
@@ -264,7 +264,7 @@ public class FileStorageService {
                                 .build()
                 );
 
-                // 4. 包装结果（含文件大小）
+                // 包装结果（含文件大小）
                 Map<String, Object> result = new HashMap<>();
                 result.put("originalFilename", originalFilename);
                 result.put("inputStream", response); // 仍是 GetObjectResponse，后续 Controller 包装
@@ -419,7 +419,7 @@ public class FileStorageService {
         Assert.notNull(chunkFile, "分片文件不能为空");
         Assert.isTrue(chunkFile.getSize() > 0, "分片文件大小不能为0");
 
-        // 1. 从Redis获取分片元数据
+        // 从Redis获取分片元数据
         String redisKey = MULTIPART_META_PREFIX + uploadId;
         String metaJson = stringRedisTemplate.opsForValue().get(redisKey);
         if (metaJson == null) {
@@ -427,7 +427,7 @@ public class FileStorageService {
         }
         MultipartMeta meta = JSON.parseObject(metaJson, new TypeReference<>() {});
 
-        // 2. 分布式锁：防止同一分片并发上传
+        // 分布式锁：防止同一分片并发上传
         String lockKey = CHUNK_LOCK_PREFIX + meta.getFileMd5() + ":" + partNumber;
         String requestId = UUID.randomUUID().toString();
         boolean lockAcquired = distributedLockService.tryLock(lockKey, requestId, 15, 2, 100);
@@ -437,21 +437,21 @@ public class FileStorageService {
                 throw new RuntimeException("分片" + partNumber + "正在上传中，请勿重复提交");
             }
 
-            // 3. 校验分片编号是否合法（不超过总分片数）
+            // 校验分片编号是否合法（不超过总分片数）
             if (partNumber > meta.getTotalParts()) {
                 throw new RuntimeException("分片编号非法：当前" + partNumber + "，最大" + meta.getTotalParts());
             }
 
-            // 4. 校验分片是否已上传（避免重复上传）
+            // 校验分片是否已上传（避免重复上传）
             if (meta.getUploadedParts().contains(partNumber)) {
                 log.info("分片已上传，跳过：uploadId={}, partNumber={}", uploadId, partNumber);
                 return meta.getOriginalFilename();
             }
 
-            // 5. 分片对象名格式：fileName-part-partNumber（便于后续合并）
+            // 分片对象名格式：fileName-part-partNumber（便于后续合并）
             String chunkObjectName = meta.getOriginalFilename() + "-part-" + partNumber;
 
-            // 6. 上传分片到MinIO
+            // 上传分片到MinIO
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(bucketName)
@@ -461,7 +461,7 @@ public class FileStorageService {
                             .build()
             );
 
-            // 7. 更新Redis元数据（添加已上传分片号，续期）
+            // 更新Redis元数据（添加已上传分片号，续期）
             meta.getUploadedParts().add(partNumber);
             stringRedisTemplate.opsForValue().set(
                     redisKey,
@@ -493,7 +493,7 @@ public class FileStorageService {
 
         String redisKey = MULTIPART_META_PREFIX + uploadId;
         try {
-            // 1. 获取并校验分片元数据
+            // 获取并校验分片元数据
             String metaJson = stringRedisTemplate.opsForValue().get(redisKey);
             if (metaJson == null) {
                 throw new RuntimeException("分片上传元数据不存在，可能已过期：uploadId=" + uploadId);
@@ -503,19 +503,19 @@ public class FileStorageService {
             String originalFilename = meta.getOriginalFilename();
             String fileMd5 = meta.getFileMd5();
 
-            // 2. 校验分片完整性（已上传分片数 == 总分片数）
+            // 校验分片完整性（已上传分片数 == 总分片数）
             if (meta.getUploadedParts().size() != meta.getTotalParts()) {
                 throw new RuntimeException("分片数量不完整：已上传" + meta.getUploadedParts().size() + "个，需" + meta.getTotalParts() + "个");
             }
 
-            // 3. 校验分片编号连续性（避免缺失中间分片）
+            // 校验分片编号连续性（避免缺失中间分片）
             for (int i = 1; i <= meta.getTotalParts(); i++) {
                 if (!meta.getUploadedParts().contains(i)) {
                     throw new RuntimeException("分片缺失：partNumber=" + i);
                 }
             }
 
-            // 4. 构建合并源（按分片编号顺序排列）
+            // 构建合并源（按分片编号顺序排列）
             List<ComposeSource> sources = new ArrayList<>(meta.getTotalParts());
             for (int i = 1; i <= meta.getTotalParts(); i++) {
                 String chunkObjectName = originalFilename + "-part-" + i;
@@ -529,7 +529,7 @@ public class FileStorageService {
                         .build());
             }
 
-            // 5. 合并分片为最终文件（MinIO 8.6.0 支持 composeObject）
+            // 合并分片为最终文件
             minioClient.composeObject(
                     ComposeObjectArgs.builder()
                             .bucket(bucketName)
@@ -543,7 +543,7 @@ public class FileStorageService {
             log.info("分片合并成功：uploadId={}, fileName={}, totalParts={}",
                     uploadId, originalFilename, meta.getTotalParts());
 
-            // 6. 异步删除分片文件（非核心流程，不阻塞合并结果返回）
+            // 异步删除分片文件（非核心流程，不阻塞合并结果返回）
             CompletableFuture.runAsync(() -> {
                 for (int i = 1; i <= meta.getTotalParts(); i++) {
                     String chunkObjectName = originalFilename + "-part-" + i;
@@ -559,7 +559,7 @@ public class FileStorageService {
                 log.info("分片文件及元数据清理完成：uploadId={}", uploadId);
             }, uploadTaskExecutor);
 
-            // 7. 返回最终文件的预签名URL
+            // 返回最终文件的预签名URL
             String fileUrl = getFileUrl(storageFileName, DEFAULT_URL_EXPIRY_SECONDS);
             return buildResultMap(originalFilename, storageFileName, fileUrl, fileMd5);
         } catch (Exception e) {
@@ -577,7 +577,7 @@ public class FileStorageService {
 
         String redisKey = MULTIPART_META_PREFIX + uploadId;
         try {
-            // 1. 获取分片元数据
+            // 获取分片元数据
             String metaJson = stringRedisTemplate.opsForValue().get(redisKey);
             if (metaJson == null) {
                 log.warn("分片上传元数据不存在，无需取消：uploadId={}", uploadId);
@@ -586,7 +586,7 @@ public class FileStorageService {
             MultipartMeta meta = JSON.parseObject(metaJson, new TypeReference<MultipartMeta>() {});
             String fileName = meta.getOriginalFilename();
 
-            // 2. 删除已上传的分片文件
+            // 删除已上传的分片文件
             for (int partNumber : meta.getUploadedParts()) {
                 String chunkObjectName = fileName + "-part-" + partNumber;
                 try {
@@ -597,7 +597,7 @@ public class FileStorageService {
                 }
             }
 
-            // 3. 删除Redis元数据
+            // 删除Redis元数据
             stringRedisTemplate.delete(redisKey);
             log.info("取消分片上传成功：uploadId={}, 已清理{}个分片文件",
                     uploadId, meta.getUploadedParts().size());
@@ -646,17 +646,17 @@ public class FileStorageService {
 
         return CompletableFuture.runAsync(() -> {
             try {
-                // 1. 先上传到本地MinIO（用join()替代get()，避免受检异常）
+                // 先上传到本地MinIO（用join()替代get()，避免受检异常）
                 String fileUrl = uploadFileAsync(file).join().get("fileUrl");
                 String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
 
                 // 更新任务状态（本地上传完成：30%进度）
                 updateTaskStatus(taskId, "uploaded_to_local", 30, null, fileName, null);
 
-                // 2. 计算每个目标的进度增量（70%分配给多目标上传）
+                // 计算每个目标的进度增量（70%分配给多目标上传）
                 int progressIncrement = 70 / targetUrls.length;
 
-                // 3. 非阻塞并行上传到所有目标
+                // 非阻塞并行上传到所有目标
                 Flux.fromArray(targetUrls)
                         .parallel() // 并行执行
                         .runOn(reactor.core.scheduler.Schedulers.fromExecutor(uploadTaskExecutor))
@@ -664,7 +664,7 @@ public class FileStorageService {
                         .sequential()
                         .blockLast(); // 等待所有上传完成（非阻塞当前线程池）
 
-                // 4. 更新最终状态（100%）
+                // 更新最终状态（100%）
                 updateTaskStatus(taskId, "completed", 100, fileUrl, fileName, null);
             } catch (Exception e) {
                 log.error("同步上传任务失败：taskId={}", taskId, e);

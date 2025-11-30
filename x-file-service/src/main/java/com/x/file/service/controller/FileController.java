@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * 文件操作完整控制器（支持单文件上传、分片上传、断点续传、下载、删除等）
+ * 文件操作
  *
  * @author whj
  */
