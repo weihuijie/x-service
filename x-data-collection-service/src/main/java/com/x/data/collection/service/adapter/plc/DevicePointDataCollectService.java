@@ -52,7 +52,7 @@ public class DevicePointDataCollectService {
             List<PlcReadDto<Object>> plcReadDtoList = deviceCollectPoints.stream()
                     .map(e -> PlcReadDto.build(e.getPointAddr(), PlcValueType.getByCode(e.getPointType()))).filter(Objects::nonNull).toList();
             // 发送 PLC 请求
-            List<PlcReadDto<Object>> plcData = plcService.getPlcData(plcReadDtoList, deviceInfoEntity.getPlcCode(), 1000);
+            List<PlcReadDto<Object>> plcData = plcService.getPlcData(plcReadDtoList, deviceInfoEntity.getDataCode(), 1000);
             // 时间戳
             Long timestamp = System.currentTimeMillis();
             // 将结果转成map ， key = pointAddr, value = pointValue

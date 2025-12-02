@@ -46,5 +46,7 @@ public interface IDeviceInfoDubboService {
     /**
      * 获取设备信息，包含点位
      */
-    R<List<DeviceInfoEntity>> listContainsPoint(@RequestParam(name = "id",required = false) Long id);
+    R<List<DeviceInfoEntity>> listContainsPoint();
+    R<DeviceInfoEntity> infoContainsPoint(@RequestParam(name = "id") Long id);
+    R<DeviceInfoEntity> infoContainsPoint(@RequestParam(name = "deviceCode") String deviceCode);
 }

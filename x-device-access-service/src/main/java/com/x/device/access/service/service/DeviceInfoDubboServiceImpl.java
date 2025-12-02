@@ -92,9 +92,39 @@ public class DeviceInfoDubboServiceImpl implements IDeviceInfoDubboService {
     }
 
     @Override
-    public R<List<DeviceInfoEntity>> listContainsPoint(@RequestParam(name = "id",required = false) Long id) {
+    public R<List<DeviceInfoEntity>> listContainsPoint() {
+        return R.data(listContainsPoint(null,null));
+    }
+
+    @Override
+    public R<DeviceInfoEntity> infoContainsPoint(@RequestParam(name = "id") Long id) {
+        List<DeviceInfoEntity> deviceInfoEntityList = listContainsPoint(id, null);
+        if(ObjectUtils.isNotEmpty(deviceInfoEntityList)){
+            if (deviceInfoEntityList.size() > 1){
+                log.warn("设备信息列表中存在多个设备信息，请检查设备信息");
+            }
+            return R.data(deviceInfoEntityList.get(0));
+        }
+        return R.data(null);
+    }
+
+    @Override
+    public R<DeviceInfoEntity> infoContainsPoint(String deviceCode) {
+        List<DeviceInfoEntity> deviceInfoEntityList = listContainsPoint(null, deviceCode);
+        if(ObjectUtils.isNotEmpty(deviceInfoEntityList)){
+            if (deviceInfoEntityList.size() > 1){
+                log.warn("设备信息列表中存在多个设备编码，请检查设备信息");
+            }
+            return R.data(deviceInfoEntityList.get(0));
+        }
+        return R.data(null);
+    }
+
+    private List<DeviceInfoEntity> listContainsPoint(Long id,String deviceCode){
         LambdaQueryWrapper<DeviceInfoEntity> qw = new LambdaQueryWrapper<>();
         qw.eq(ObjectUtils.isNotEmpty(id),DeviceInfoEntity::getId,id);
+        qw.eq(ObjectUtils.isNotEmpty(deviceCode),DeviceInfoEntity::getDeviceCode,deviceCode);
+
         List<DeviceInfoEntity> deviceList = deviceInfoService.list(qw);
 
         for (DeviceInfoEntity deviceInfoEntity : deviceList) {
@@ -103,7 +133,7 @@ public class DeviceInfoDubboServiceImpl implements IDeviceInfoDubboService {
             List<DevicePointInfoEntity> pointList = devicePointInfoDubboService.list(devicePointInfoEntity).getData();
             deviceInfoEntity.setPointList(pointList);
         }
-        List<DeviceInfoEntity> filter = deviceList.stream().filter(e -> ObjectUtils.isNotEmpty(e.getPointList())).collect(Collectors.toList());
-        return R.data( filter);
+        return deviceList.stream().filter(e -> ObjectUtils.isNotEmpty(e.getPointList())).collect(Collectors.toList());
     }
+
 }

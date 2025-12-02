@@ -17,6 +17,7 @@
         <module name="x-dubbo-api" />
         <module name="x-repository-service" />
         <module name="x-alert-notice-service" />
+        <module name="x-data-parser-service" />
         <module name="x-device-access-service" />
         <module name="x-file-service" />
         <module name="x-data-collection-service" />

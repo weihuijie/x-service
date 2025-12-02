@@ -19,6 +19,8 @@
     <file url="file://$PROJECT_DIR$/x-data-collection-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-data-collection-tcp-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-data-collection-tcp-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-data-parser-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/x-data-parser-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-data-sync-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-data-sync-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/x-device-access-service/src/main/java" charset="UTF-8" />

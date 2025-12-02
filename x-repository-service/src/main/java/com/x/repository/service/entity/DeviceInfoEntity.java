@@ -32,7 +32,7 @@ public class DeviceInfoEntity extends BaseEntity {
     @NotBlank(message = "设备编码不能为空")
     private String deviceCode;
 
-    private String plcCode;
+    private String dataCode;
 
     @TableField(exist = false)
     private Long timestamp;

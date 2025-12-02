@@ -31,6 +31,7 @@
         <module>x-file-service</module>
         <module>x-data-collection-tcp-service</module>
         <module>x-data-collection-mqtt-service</module>
+        <module>x-data-parser-service</module>
     </modules>
 
     <properties><!-- 配置，一般为版本管理 -->

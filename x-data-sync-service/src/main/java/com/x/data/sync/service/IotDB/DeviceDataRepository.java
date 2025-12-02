@@ -55,7 +55,7 @@ public class DeviceDataRepository {
 
     // 注册时间序列
     public void createTimeSeries() {
-        List<DeviceInfoEntity> list = deviceInfoDubboService.listContainsPoint(null).getData();
+        List<DeviceInfoEntity> list = deviceInfoDubboService.listContainsPoint().getData();
         if (ObjectUtils.isEmpty(list)) {
             log.warn("没有找到任何设备点信息，跳过创建时间序列");
             return;

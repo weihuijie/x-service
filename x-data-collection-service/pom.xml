@@ -105,6 +105,18 @@
             <version>31.1-jre</version>
         </dependency>
 
+
+        <!-- Redis缓存 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- 连接池 -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+
     </dependencies>
 
     <!-- 核心：配置打包插件-->
