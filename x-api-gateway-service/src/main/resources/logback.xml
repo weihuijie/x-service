@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+
+    <springProperty scope="context" name="serverPort" source="server.port"/>
+    <property name="LOG_FILE" value="logs/x-api-gateway-service"/>
+
+    <!-- 彩色日志依赖的渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+
+    <!-- 彩色日志格式 -->
+    <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}" />
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 生成日志文件 -->
+    <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}-info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}-info.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>1000</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] [%logger{50}] %-5level: %msg%n</pattern>
+        </encoder>
+        <!-- 打印日志级别 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 生成日志文件 -->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}-error.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>1000</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] [%logger{50}] %-5level: %msg%n</pattern>
+        </encoder>
+        <!-- 打印日志级别 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 生成日志文件 -->
+    <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}-debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}-debug.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>1000</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] [%logger{50}] %-5level: %msg%n</pattern>
+        </encoder>
+        <!-- 打印日志级别 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 生成日志文件 -->
+    <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}-warn.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}-warn.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>1000</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] [%logger{50}] %-5level: %msg%n</pattern>
+        </encoder>
+        <!-- 打印日志级别 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+
+    <!-- 日志输出级别 -->
+    <root level="DEBUG">
+		<appender-ref ref="STDOUT" />
+        <appender-ref ref="INFO"/>
+        <appender-ref ref="ERROR"/>
+        <appender-ref ref="WARN" />
+        <appender-ref ref="DEBUG" />
+    </root>
+
+    <!-- MyBatis log configure -->
+    <logger name="com.apache.ibatis" level="INFO"/>
+    <logger name="org.mybatis.spring" level="DEBUG"/>
+    <logger name="java.sql.Connection" level="DEBUG"/>
+    <logger name="java.sql.Statement" level="DEBUG"/>
+    <logger name="java.sql.PreparedStatement" level="DEBUG"/>
+
+    <!-- 减少部分debug日志 -->
+    <logger name="org.redisson.connection.DNSMonitor" level="INFO"/>
+    <logger name="druid.sql" level="INFO"/>
+    <logger name="org.apache.shiro" level="INFO"/>
+    <logger name="org.mybatis.spring" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework.context" level="WARN"/>
+    <logger name="org.springframework.beans" level="WARN"/>
+    <logger name="com.baomidou.mybatisplus" level="INFO"/>
+    <logger name="org.apache.ibatis.io" level="INFO"/>
+    <logger name="org.apache.velocity" level="INFO"/>
+    <logger name="org.eclipse.jetty" level="INFO"/>
+    <logger name="io.undertow" level="INFO"/>
+    <logger name="io.lettuce" level="INFO"/>
+    <logger name="org.xnio.nio" level="INFO"/>
+    <logger name="org.thymeleaf" level="INFO"/>
+    <logger name="springfox.documentation" level="INFO"/>
+    <logger name="org.hibernate.validator" level="INFO"/>
+    <logger name="com.netflix.loadbalancer" level="INFO"/>
+    <logger name="com.netflix.hystrix" level="INFO"/>
+    <logger name="com.netflix.zuul" level="INFO"/>
+    <logger name="de.codecentric" level="INFO"/>
+    <!-- cache INFO -->
+    <logger name="net.sf.ehcache" level="INFO"/>
+    <logger name="org.springframework.cache" level="INFO"/>
+    <!-- cloud -->
+    <logger name="org.apache.http" level="INFO"/>
+    <logger name="com.netflix.discovery" level="INFO"/>
+    <logger name="com.netflix.eureka" level="INFO"/>
+
+    <logger name="io.netty" level="INFO"/>
+    <logger name="org.redisson.cluster.ClusterConnectionManager" level="INFO"/>
+
+</configuration>

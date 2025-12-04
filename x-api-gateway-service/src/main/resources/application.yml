@@ -5,10 +5,11 @@ server:
     mime-types: application/json,application/xml,text/html,text/plain,text/css,application/javascript
 
 
-
 spring:
   application:
     name: x-api-gateway-service
+  profiles:
+    active: test
   cloud:
     gateway:
 
@@ -65,20 +66,6 @@ spring:
         pool:
           max-connections: 500                   # 最大连接数
           max-idle-time: 300000                  # 连接最大存活时间（5分钟）
-
-    # Nacos服务发现配置
-    nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848
-        namespace: public
-        group: DEFAULT_GROUP
-  # Redis配置
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      database: 0
-      timeout: 2000ms
 
 ## 熔断器配置
 #resilience4j:

@@ -1,0 +1,17 @@
+
+
+spring:
+  cloud:
+    # Nacos服务发现配置
+    nacos:
+      discovery:
+        server-addr: 10.33.93.12:8848
+        namespace: public
+        group: DEFAULT_GROUP
+  # Redis配置
+  data:
+    redis:
+      host: 10.33.93.12
+      port: 6379
+      database: 0
+      timeout: 2000ms
