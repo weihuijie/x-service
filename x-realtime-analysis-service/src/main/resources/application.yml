@@ -3,13 +3,3 @@ spring:
     name: x-realtime-analysis-service
   profiles:
     active: dev
-
-logging:
-  level:
-    com.x.realtime.analysis.service: info
-    # Flink 核心包日志级别改为 DEBUG，输出算子处理细节
-    #org.apache.flink.streaming.runtime.tasks: DEBUG
-    #org.apache.flink.streaming.api.operators: DEBUG
-    # 你的包日志级别改为 DEBUG，查看数据处理过程
-    #com.x.realtime.analysis.service.flink: DEBUG
-    org.apache.flink.*: warn

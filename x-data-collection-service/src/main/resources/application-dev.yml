@@ -1,0 +1,88 @@
+server:
+  port: 8020
+
+  tomcat:
+    keep-alive-timeout: 120000  # 长连接保持时间（120秒，大于网关空闲超时60秒）
+    max-keep-alive-requests: 100  # 单个长连接最大请求数（默认100，可调整）
+    connection-timeout: 60000  # 连接超时（60秒，与网关匹配）
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    # 生产者配置
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # Key 序列化器
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer # Value 序列化器
+      acks: 1 # 消息确认机制（1=leader 接收成功即返回）
+      retries: 3 # 失败重试次数
+      batch-size: 16384 # 批量发送大小（默认 16KB）
+      buffer-memory: 33554432 # 发送缓冲区大小（默认 32MB）
+
+    # 监听容器配置（消费者监听相关）
+    listener:
+      concurrency: 1 # 消费并发数（与分区数匹配，默认 1）
+      missing-topics-fatal: false # 监听的主题不存在时，应用不启动失败（测试环境推荐关闭）
+
+  # MQTT配置
+  mqtt:
+    broker:
+      url: tcp://localhost:1883
+    client:
+      id: data-collection-service
+    username: 
+    password: 
+    topic:
+      device:
+        data: device/+/data
+
+  # Redis配置
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: ""
+      database: 0
+      lettuce:
+        pool:
+          max-active: 50  # 最大连接数
+          max-idle: 20
+          min-idle: 5
+logging:
+  level:
+    com.x.data.collection.service: info
+
+plc-os:
+  ip: 192.168.1.1
+  bizLog: true
+  mock: true
+
+xxl:
+  job:
+    admin:
+      addresses: http://127.0.0.1:8180/xxl-job-admin
+      accessToken: default_token
+      timeout: 3
+    executor:
+      appname: ${spring.application.name}
+      address:
+      ip:
+      port: 9998
+      logpath: "D:\\soft\\xxl-job\\log"
+      logretentiondays: 30
+
+# Dubbo配置
+dubbo:
+  consumer:
+    check: false # 禁用启动检测
+    lazy: true   # 全局延迟注入，避免时机冲突
+  application:
+    name: ${spring.application.name}
+    logger: slf4j
+    qos-enable: false # 可选，默认true, QOS 服务治理功能
+  registry:
+    address: nacos://nacos:nacos@127.0.0.1:8848
+    register-mode: instance
+  protocols:
+    tri-id:
+      name: tri
+      port: -1

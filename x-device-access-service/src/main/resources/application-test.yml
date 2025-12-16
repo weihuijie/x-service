@@ -5,13 +5,13 @@ spring:
   data:
     redis:
       port: 6379
-      host: localhost
+      host: 10.33.93.12
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/x?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.33.93.12:13306/x?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
-    password:
+    password: root
 
 
 
@@ -29,7 +29,7 @@ dubbo:
     logger: slf4j
     qos-enable: false # 可选，默认true, QOS 服务治理功能
   registry:
-    address: nacos://nacos:nacos@127.0.0.1:8848
+    address: nacos://nacos:nacos@10.33.93.12:8848
     register-mode: instance
   protocols:
     tri-id:

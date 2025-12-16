@@ -1,13 +1,5 @@
-server:
-  port: 9207
-
-# 应用名称
 spring:
   application:
     name: x-data-parser-service
-
-# 日志配置
-logging:
-  level:
-    com.x: debug
-  config: classpath:logback-spring.xml
+  profiles:
+    active: dev

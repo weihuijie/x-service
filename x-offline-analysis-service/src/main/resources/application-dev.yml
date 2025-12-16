@@ -1,0 +1,47 @@
+server:
+  port: 8050
+
+#IoTDB 配置
+iotdb:
+  url: jdbc:iotdb://localhost:6667/ # IoTDB 集群地址
+  user: root
+  password: root
+  table-path: root.iot.* # 设备父节点（读取全量设备测点）
+
+# Spark 配置（YARN 模式）
+spark:
+  app-name: IoTDB-Report-Analysis
+  master: yarn # 提交到 YARN 集群
+  deploy-mode: cluster # 生产环境用 cluster（Driver 运行在 YARN 上）
+  executor:
+    cores: 2 # 每个 Executor 核心数
+    memory: 4g # 每个 Executor 内存
+  num-executors: 3 # Executor 数量
+  jars: hdfs://localhost:8020/lib/iotdb-spark-connector_2.12-2.0.3.jar # 依赖包上传到 HDFS，避免分发
+
+# Hadoop 核心配置
+hadoop:
+  hdfs:
+    url: hdfs://localhost:9000 # HDFS 服务地址（必填）
+    report-path: /iotdb/reports # 报表根目录（HDFS 路径，必填）
+    default-format: parquet # 默认存储格式（csv/parquet，默认 parquet）
+    charset: UTF-8 # 文件编码（默认 UTF-8）
+    parquet-compression: snappy # Parquet 压缩格式（snappy/gzip/none，默认 snappy）
+    default-partition: 10 # 默认分区数（避免小文件过多，默认 10）
+  yarn:
+    resource-manager: localhost:8088 # YARN ResourceManager 地址（必填）
+
+
+xxl:
+  job:
+    admin:
+      addresses: http://127.0.0.1:8180/xxl-job-admin
+      accessToken: default_token
+      timeout: 3
+    executor:
+      appname: ${spring.application.name}
+      address:
+      ip:
+      port: 9998
+      logpath: "D:\\soft\\xxl-job\\log"
+      logretentiondays: 30

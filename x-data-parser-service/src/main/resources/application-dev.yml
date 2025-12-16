@@ -1,0 +1,8 @@
+server:
+  port: 9207
+
+# 日志配置
+logging:
+  level:
+    com.x: debug
+  config: classpath:logback-spring.xml

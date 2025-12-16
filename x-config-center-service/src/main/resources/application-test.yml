@@ -1,0 +1,6 @@
+server:
+  port: 8000
+
+logging:
+  level:
+    com.x.config.center.service: debug

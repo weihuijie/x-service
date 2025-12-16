@@ -1,0 +1,38 @@
+server:
+  port: 19101
+
+spring:
+  kafka:
+    bootstrap-servers: 10.33.93.12:9092
+    # 生产者配置
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # Key 序列化器
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer # Value 序列化器
+      acks: 1 # 消息确认机制（1=leader 接收成功即返回）
+      retries: 3 # 失败重试次数
+      batch-size: 16384 # 批量发送大小（默认 16KB）
+      buffer-memory: 33554432 # 发送缓冲区大小（默认 32MB）
+
+    # 监听容器配置（消费者监听相关）
+    listener:
+      concurrency: 1 # 消费并发数（与分区数匹配，默认 1）
+      missing-topics-fatal: false # 监听的主题不存在时，应用不启动失败（测试环境推荐关闭）
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 10.33.93.12:8848
+
+logging:
+  level:
+    com.x: error
+
+
+# TCP 服务自定义配置（可覆盖 TcpServerProperties 中的默认值）
+tcp:
+  server:
+    port: 9101 # 监听端口
+    worker-threads: 8 # 工作线程数（根据 CPU 核心调整）
+    read-idle-seconds: 300 # 空闲连接超时（5分钟）
+    buffer-size: 32768 # 缓冲区大小
+    frame-max-length: 1048576 # 最大帧长度

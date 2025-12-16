@@ -1,3 +1,8 @@
+server:
+  port: 9100
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain,text/css,application/javascript
 
 
 spring:
@@ -8,6 +13,103 @@ spring:
         server-addr: 10.33.93.12:8848
         namespace: public
         group: DEFAULT_GROUP
+
+    gateway:
+
+
+      #      # 启用熔断
+      #      default-filters:
+      #        - name: CircuitBreaker
+      #          args:
+      #            name: defaultCircuitBreaker
+      #            fallbackUri: forward:/fallback
+      routes:
+        - id: x-device-access-service
+          uri: lb://x-device-access-service
+          predicates:
+            - Path=/device/**
+        - id: x-data-sync-service
+          uri: lb://x-data-sync-service
+          predicates:
+            - Path=/data/sync/**
+        - id: x-data-collection-service
+          uri: lb://x-data-collection-service
+          predicates:
+            - Path=/data/collection/**
+          metadata:
+            response-timeout: 10000  # 路由级响应超时（10s）
+            connect-timeout: 5000    # 路由级连接超时（5s）
+        - id: x-auth-service
+          uri: lb://x-auth-service
+          predicates:
+            - Path=/auth/**
+        - id: x-manage-service
+          uri: lb://x-manage-service
+          predicates:
+            - Path=/manage/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: manageServiceCircuitBreaker
+                fallbackUri: forward:/fallback/manage
+        - id: file-service
+          uri: lb://x-file-service
+          predicates:
+            - Path=/file/**
+          filters:
+            - name: AddResponseHeader
+              args:
+                name: X-Response-Time
+                value: "N/A"
+      httpclient:
+        # 超时配置（平衡速度与容错）
+        connect-timeout: 5000                    # 网关→后端建连超时（5s）
+        response-timeout: 10000                  # 等待后端响应超时（10s）
+        # 连接池配置
+        pool:
+          max-connections: 500                   # 最大连接数
+          max-idle-time: 300000                  # 连接最大存活时间（5分钟）
+
+  ## 熔断器配置
+  #resilience4j:
+  #  circuitbreaker:
+  #    instances:
+  #      defaultCircuitBreaker:
+  #        slidingWindowSize: 10
+  #        failureRateThreshold: 50
+  #        waitDurationInOpenState: 5000
+  #        permittedNumberOfCallsInHalfOpenState: 3
+  #        slidingWindowType: TIME_BASED
+  #        minimumNumberOfCalls: 5
+  #      manageServiceCircuitBreaker:
+  #        slidingWindowSize: 10
+  #        failureRateThreshold: 40
+  #        waitDurationInOpenState: 3000
+
+  # 监控配置
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: '*'
+    endpoint:
+      health:
+        show-details: always
+      gateway:
+        enabled: true
+    prometheus:
+      metrics:
+        export:
+          enabled: true
+
+  # 日志配置
+  logging:
+    level:
+      com.x.api.gateway.service: info
+      org.springframework.cloud.gateway: error
+      io.netty.*: error
+      reactor.netty.channel.FluxReceive: error
+
   # Redis配置
   data:
     redis:

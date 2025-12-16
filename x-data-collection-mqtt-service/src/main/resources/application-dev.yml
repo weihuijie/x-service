@@ -1,0 +1,42 @@
+server:
+  port: 19102
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    # 生产者配置
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # Key 序列化器
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer # Value 序列化器
+      acks: 1 # 消息确认机制（1=leader 接收成功即返回）
+      retries: 3 # 失败重试次数
+      batch-size: 16384 # 批量发送大小（默认 16KB）
+      buffer-memory: 33554432 # 发送缓冲区大小（默认 32MB）
+
+    # 监听容器配置（消费者监听相关）
+    listener:
+      concurrency: 1 # 消费并发数（与分区数匹配，默认 1）
+      missing-topics-fatal: false # 监听的主题不存在时，应用不启动失败（测试环境推荐关闭）
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+
+logging:
+  level:
+    com.x: info
+    org.apache: info
+
+
+# MQTT 服务自定义配置
+mqtt:
+  broker:
+    url: tcp://localhost:2883
+    username: admin
+    password: public
+    client-id: mqtt-data-collector-client
+    default-topic: device/data
+    # 消息质量（0：最多一次，1：至少一次，2：恰好一次，根据需求选择）
+    qos: 0
+    timeout: 30

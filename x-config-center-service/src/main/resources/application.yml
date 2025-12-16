@@ -1,14 +1,5 @@
-server:
-  port: 8000
-
 spring:
   application:
     name: config-center-service
-    
-nacos:
-  config:
-    server-addr: 127.0.0.1:8848
-
-logging:
-  level:
-    com.x.config.center.service: debug
+  profiles:
+    active: dev

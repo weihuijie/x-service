@@ -1,0 +1,28 @@
+server:
+  port: 8100
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/x_auth?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+
+logging:
+  level:
+    com.x.auth.service: debug
+
+# Dubbo配置
+dubbo:
+  application:
+    name: ${spring.application.name}
+  registry:
+    address: nacos://nacos:nacos@127.0.0.1:8848
+  protocol:
+    name: grpc
+    port: -1
