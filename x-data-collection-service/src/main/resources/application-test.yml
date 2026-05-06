@@ -7,8 +7,15 @@ server:
     connection-timeout: 60000  # 连接超时（60秒，与网关匹配）
 
 spring:
+  cloud:
+    # Nacos服务发现配置
+    nacos:
+      discovery:
+        server-addr: 10.12.1.113:8848
+        namespace: public
+        group: DEFAULT_GROUP
   kafka:
-    bootstrap-servers: 10.33.93.12:9092
+    bootstrap-servers: 10.12.1.113:9092
     # 生产者配置
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # Key 序列化器
@@ -26,7 +33,7 @@ spring:
   # MQTT配置
   mqtt:
     broker:
-      url: tcp://10.33.93.12:1883
+      url: tcp://10.12.1.113:1883
     client:
       id: data-collection-service
     username: 
@@ -38,7 +45,7 @@ spring:
   # Redis配置
   data:
     redis:
-      host: 10.33.93.12
+      host: 10.12.1.113
       port: 6379
       password: ""
       database: 0
@@ -54,7 +61,7 @@ logging:
 xxl:
   job:
     admin:
-      addresses: http://10.33.93.12:8180/xxl-job-admin
+      addresses: http://10.12.1.113:8180/xxl-job-admin
       accessToken: default_token
       timeout: 3
     executor:
@@ -75,7 +82,7 @@ dubbo:
     logger: slf4j
     qos-enable: false # 可选，默认true, QOS 服务治理功能
   registry:
-    address: nacos://nacos:nacos@10.33.93.12:8848
+    address: nacos://nacos:nacos@10.12.1.113:8848
     register-mode: instance
   protocols:
     tri-id:

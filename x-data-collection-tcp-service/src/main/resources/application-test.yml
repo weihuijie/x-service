@@ -3,7 +3,7 @@ server:
 
 spring:
   kafka:
-    bootstrap-servers: 10.33.93.12:9092
+    bootstrap-servers: 10.12.1.113:9092
     # 生产者配置
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # Key 序列化器
@@ -19,9 +19,12 @@ spring:
       missing-topics-fatal: false # 监听的主题不存在时，应用不启动失败（测试环境推荐关闭）
 
   cloud:
+    # Nacos服务发现配置
     nacos:
       discovery:
-        server-addr: 10.33.93.12:8848
+        server-addr: 10.12.1.113:8848
+        namespace: public
+        group: DEFAULT_GROUP
 
 logging:
   level:

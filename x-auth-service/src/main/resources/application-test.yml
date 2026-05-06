@@ -4,13 +4,13 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://10.33.93.12:3306/x_auth?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.12.1.113:3306/x_auth?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
-    password: root
+    password: Tzsz@1234
   cloud:
     nacos:
       discovery:
-        server-addr: 10.33.93.12:8848
+        server-addr: 10.12.1.113:8848
 
 
 logging:
@@ -22,7 +22,7 @@ dubbo:
   application:
     name: ${spring.application.name}
   registry:
-    address: nacos://nacos:nacos@10.33.93.12:8848
+    address: nacos://nacos:nacos@10.12.1.113:8848
   protocol:
     name: grpc
     port: -1

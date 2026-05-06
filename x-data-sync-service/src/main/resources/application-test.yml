@@ -6,23 +6,30 @@ spring:
   data:
     redis:
       port: 6379
-      host: 10.33.93.12
+      host: 10.12.1.113
+  cloud:
+    # Nacos服务发现配置
+    nacos:
+      discovery:
+        server-addr: 10.12.1.113:8848
+        namespace: public
+        group: DEFAULT_GROUP
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://10.33.93.12:3306/x?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.12.1.113:3306/x?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
-    password: root
+    password: Tzsz@1234
 
   kafka:
-    bootstrap-servers: 10.33.93.12:9092
+    bootstrap-servers: 10.12.1.113:9092
 
 logging:
   level:
     com.x.data.sync.service: info
 
 kafka:
-  bootstrap-servers: 10.33.93.12:9092 # Kafka集群地址
+  bootstrap-servers: 10.12.1.113:9092 # Kafka集群地址
   consumer:
     group-id: data-sync-group # 消费组ID
     topic: test-topic # 消费主题
@@ -35,7 +42,7 @@ kafka:
     enable-auto-commit: false # 关闭自动提交
 
 iotdb:
-  nodeUrls: 10.33.93.12:6667
+  nodeUrls: 10.12.1.113:6667
   username: root
   password: root
 
@@ -49,7 +56,7 @@ dubbo:
     logger: slf4j
     qos-enable: false # 可选，默认true, QOS 服务治理功能
   registry:
-    address: nacos://nacos:nacos@10.33.93.12:8848
+    address: nacos://nacos:nacos@10.12.1.113:8848
     register-mode: instance
   protocols:
     tri-id:

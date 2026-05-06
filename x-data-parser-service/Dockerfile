@@ -1,17 +1,15 @@
-FROM openjdk:17-jdk-slim
 
-VOLUME /tmp
+FROM weihuijie/jdk:17-ea-4-slim
 
-# 设置时区
-ENV TZ=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# 设置工作目录
+WORKDIR /app
 
-# 添加应用 JAR 包
-ARG JAR_FILE=target/x-data-parser-service.jar
-COPY ${JAR_FILE} app.jar
+# 将jar文件复制到容器中
+COPY ./x-data-parser-service-1.0.0.jar /app/app.jar
+RUN chmod 777 /app/app.jar
 
 # 暴露端口
 EXPOSE 9207
 
-# 启动应用
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+# 运行应用程序
+ENTRYPOINT ["java","-Duser.timezone=GMT+8","-server","-Xms256m","-Xmx512m","-jar","app.jar","--spring.profiles.active=test" ]

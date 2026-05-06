@@ -9,7 +9,7 @@ server:
 
   data:
     redis:
-      host: 10.33.93.12
+      host: 10.12.1.113
       port: 6379
       database: 0
       timeout: 2000ms
@@ -21,7 +21,7 @@ server:
           min-idle: 5 # 最小空闲连接
           max-wait: 2000ms
 minio:
-  endpoint: http://10.33.93.12:9000
+  endpoint: http://10.12.1.113:9000
   access-key: admin
   secret-key: admin123456
   bucket-name: test

@@ -4,16 +4,16 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://10.33.93.12:13306/x_manage?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.12.1.113:13306/x_manage?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
-    password: root
+    password: Tzsz@1234
     
 # Dubbo配置
 dubbo:
   application:
     name: ${spring.application.name}
   registry:
-    address: nacos://nacos:nacos@10.33.93.12:8848
+    address: nacos://nacos:nacos@10.12.1.113:8848
   protocol:
     name: grpc
     port: -1
